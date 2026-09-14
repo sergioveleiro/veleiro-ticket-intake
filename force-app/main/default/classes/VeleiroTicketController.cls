@@ -11,9 +11,10 @@
 public with sharing class VeleiroTicketController {
 
     public class SetupInfo {
-        @AuraEnabled public Boolean connected;
-        @AuraEnabled public String environment;
-        @AuraEnabled public String appBase;
+        @AuraEnabled public Boolean connected;     // hay token puesto
+        @AuraEnabled public String environment;    // 'Production' | 'Beta' | 'Custom'
+        @AuraEnabled public String appBase;        // URL del portal (para links)
+        @AuraEnabled public String tokenMasked;    // token enmascarado para el UI
         @AuraEnabled public String clientId;
         @AuraEnabled public String clientName;
         @AuraEnabled public String projectId;
@@ -24,16 +25,57 @@ public with sharing class VeleiroTicketController {
     public static SetupInfo getSetup() {
         SetupInfo s = new SetupInfo();
         s.connected = VeleiroApiClient.hasToken();
-        s.environment = VeleiroApiClient.apiBaseConfigured();
-        s.appBase = VeleiroApiClient.appBaseUrl();
+        String app = VeleiroApiClient.appBaseUrl();
+        s.appBase = app;
+        s.environment = app.containsIgnoreCase('beta') ? 'Beta'
+            : (app.containsIgnoreCase('app.veleiro.ai') ? 'Production' : 'Custom');
         Veleiro_Config__c c = Veleiro_Config__c.getOrgDefaults();
         if (c != null) {
+            s.tokenMasked = maskToken(c.Api_Token__c);
             s.clientId = c.Veleiro_Client_Id__c;
             s.clientName = c.Veleiro_Client_Name__c;
             s.projectId = c.Veleiro_Project_Id__c;
             s.projectName = c.Veleiro_Project_Name__c;
         }
         return s;
+    }
+
+    // Guarda el token (Org Default). Si viene en blanco NO lo pisa (para editar solo el entorno).
+    @AuraEnabled
+    public static void saveToken(String token) {
+        if (String.isBlank(token)) return;
+        Veleiro_Config__c c = orgDefault();
+        c.Api_Token__c = token.trim();
+        upsert c;
+    }
+
+    // Cambia el entorno (Production / Beta) escribiendo Base_Url + App_Base_Url. NO toca el token.
+    // El host real lo enruta el Named Credential correspondiente (Veleiro_API / Veleiro_API_Beta).
+    @AuraEnabled
+    public static void saveEnvironment(String environment) {
+        Veleiro_Config__c c = orgDefault();
+        if (environment == 'Beta') {
+            c.Base_Url__c = 'callout:Veleiro_API_Beta/api/v1';
+            c.App_Base_Url__c = 'https://app.beta.veleiro.dev';
+        } else { // Production (default)
+            c.Base_Url__c = 'callout:Veleiro_API/api/v1';
+            c.App_Base_Url__c = 'https://app.veleiro.ai';
+        }
+        upsert c;
+    }
+
+    private static Veleiro_Config__c orgDefault() {
+        Veleiro_Config__c c = Veleiro_Config__c.getOrgDefaults();
+        if (c == null || c.Id == null) {
+            c = new Veleiro_Config__c(SetupOwnerId = UserInfo.getOrganizationId());
+        }
+        return c;
+    }
+
+    private static String maskToken(String tok) {
+        if (String.isBlank(tok)) return null;
+        String last = tok.length() > 4 ? tok.substring(tok.length() - 4) : tok;
+        return '••••••••' + last;
     }
 
     @AuraEnabled(cacheable=false)

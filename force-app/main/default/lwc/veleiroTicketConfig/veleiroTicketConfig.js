@@ -1,12 +1,28 @@
 import { LightningElement, track } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getSetup from '@salesforce/apex/VeleiroTicketController.getSetup';
+import saveToken from '@salesforce/apex/VeleiroTicketController.saveToken';
+import saveEnvironment from '@salesforce/apex/VeleiroTicketController.saveEnvironment';
 import listClients from '@salesforce/apex/VeleiroTicketController.listClients';
 import listProjects from '@salesforce/apex/VeleiroTicketController.listProjects';
 import saveMapping from '@salesforce/apex/VeleiroTicketController.saveMapping';
 
+const ENV_OPTIONS = [
+    { label: 'Production (app.veleiro.ai)', value: 'Production' },
+    { label: 'Beta (app.beta.veleiro.dev)', value: 'Beta' }
+];
+
 export default class VeleiroTicketConfig extends LightningElement {
     setup;
+
+    // Connection
+    token = '';
+    environment = 'Production';
+    editingConnection = false;
+    savingConnection = false;
+    envOptions = ENV_OPTIONS;
+
+    // Mapping
     @track clientOptions = [];
     @track projectOptions = [];
     selectedClient = '';
@@ -23,6 +39,8 @@ export default class VeleiroTicketConfig extends LightningElement {
         getSetup()
             .then((s) => {
                 this.setup = s;
+                this.environment = s.environment && s.environment !== 'Custom' ? s.environment : 'Production';
+                this.editingConnection = !s.connected;
                 this.selectedClient = s.clientId || '';
                 this.selectedClientName = s.clientName || '';
                 this.selectedProject = s.projectId || '';
@@ -30,6 +48,68 @@ export default class VeleiroTicketConfig extends LightningElement {
                 if (s.connected) this.loadClients();
             })
             .catch((e) => this.toastErr(e));
+    }
+
+    // ---------- Connection ----------
+    get showConnectionForm() {
+        return !this.setup || !this.setup.connected || this.editingConnection;
+    }
+    get canCancelConnection() {
+        return this.setup && this.setup.connected;
+    }
+    get connectionSummary() {
+        if (!this.setup) return '';
+        let s = 'Connected · ' + (this.setup.environment || 'Production');
+        if (this.setup.tokenMasked) s += ' · token ' + this.setup.tokenMasked;
+        return s;
+    }
+    get tokenPlaceholder() {
+        return this.setup && this.setup.connected ? 'Leave blank to keep the current token' : 'Paste your Veleiro API token (vlr_…)';
+    }
+
+    handleToken(e) {
+        this.token = e.target.value;
+    }
+    handleEnv(e) {
+        this.environment = e.detail.value;
+    }
+
+    saveConnection() {
+        if ((!this.setup || !this.setup.connected) && !(this.token && this.token.trim())) {
+            this.toast('Token required', 'Paste your Veleiro API token to connect.', 'warning');
+            return;
+        }
+        this.savingConnection = true;
+        const tokenToSave = this.token && this.token.trim() ? this.token : null;
+        saveEnvironment({ environment: this.environment })
+            .then(() => (tokenToSave ? saveToken({ token: tokenToSave }) : Promise.resolve()))
+            .then(() => {
+                this.token = '';
+                this.editingConnection = false;
+                this.toast('Connection saved', 'Veleiro connection updated.', 'success');
+                this.refresh();
+            })
+            .catch((e) => this.toastErr(e))
+            .finally(() => {
+                this.savingConnection = false;
+            });
+    }
+
+    editConnection() {
+        this.editingConnection = true;
+        this.token = '';
+    }
+    cancelConnection() {
+        this.editingConnection = false;
+        this.token = '';
+    }
+
+    // ---------- Mapping ----------
+    get showMapping() {
+        return this.setup && this.setup.connected && !this.editingConnection;
+    }
+    get canSave() {
+        return !!this.selectedClient;
     }
 
     loadClients() {
@@ -82,33 +162,17 @@ export default class VeleiroTicketConfig extends LightningElement {
             projectName: this.selectedProjectName
         })
             .then(() => {
-                this.dispatchEvent(
-                    new ShowToastEvent({ title: 'Saved', message: 'Ticket destination updated.', variant: 'success' })
-                );
+                this.toast('Saved', 'Ticket destination updated.', 'success');
                 this.refresh();
             })
             .catch((e) => this.toastErr(e));
     }
 
+    // ---------- helpers ----------
+    toast(title, message, variant) {
+        this.dispatchEvent(new ShowToastEvent({ title, message, variant }));
+    }
     toastErr(e) {
-        this.dispatchEvent(
-            new ShowToastEvent({
-                title: 'Error',
-                message: (e && e.body && e.body.message) || 'Unexpected error',
-                variant: 'error'
-            })
-        );
-    }
-
-    get notConnected() {
-        return !this.setup || !this.setup.connected;
-    }
-
-    get canSave() {
-        return !!this.selectedClient;
-    }
-
-    get environment() {
-        return this.setup ? this.setup.environment : '';
+        this.toast('Error', (e && e.body && e.body.message) || 'Unexpected error', 'error');
     }
 }

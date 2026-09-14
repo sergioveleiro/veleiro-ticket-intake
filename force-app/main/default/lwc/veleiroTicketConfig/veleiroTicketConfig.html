@@ -1,25 +1,67 @@
 <template>
     <lightning-card icon-name="standard:settings" title="Ticket Intake Setup">
         <div class="slds-p-horizontal_medium slds-p-bottom_medium">
-            <!-- Connection -->
-            <template if:true={notConnected}>
-                <div class="slds-box slds-theme_shade slds-m-bottom_small">
-                    <p class="slds-text-title_bold">Not connected to Veleiro</p>
-                    <p class="slds-text-body_small slds-m-top_xx-small">
-                        Paste your Veleiro API token (with <code>task:write</code> plus client/project read) in
-                        <b>Setup &gt; Custom Settings &gt; Veleiro Config &gt; Manage</b>, then reload this page.
-                    </p>
+            <!-- ===================== Connection ===================== -->
+            <div class="slds-text-title_caps slds-text-color_weak slds-m-bottom_xx-small">1 · Connection</div>
+
+            <!-- Connected summary -->
+            <template if:false={showConnectionForm}>
+                <div class="slds-box slds-box_xx-small slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+                    <div class="slds-text-body_regular">
+                        <lightning-icon icon-name="utility:success" size="xx-small" variant="success"></lightning-icon>
+                        <span class="slds-m-left_xx-small">{connectionSummary}</span>
+                    </div>
+                    <lightning-button label="Edit" variant="neutral" onclick={editConnection}></lightning-button>
                 </div>
             </template>
 
-            <template if:false={notConnected}>
-                <div class="slds-box slds-box_xx-small slds-m-bottom_small slds-text-body_small">
-                    <lightning-icon icon-name="utility:success" size="xx-small" variant="success"></lightning-icon>
-                    <span class="slds-m-left_xx-small">Connected · {environment}</span>
-                </div>
+            <!-- Connect / edit form -->
+            <template if:true={showConnectionForm}>
+                <div class="slds-box slds-theme_shade">
+                    <lightning-combobox
+                        label="Veleiro environment"
+                        value={environment}
+                        options={envOptions}
+                        onchange={handleEnv}
+                    ></lightning-combobox>
 
-                <p class="slds-text-body_regular slds-m-bottom_xx-small">
-                    Choose which Veleiro client and project the tickets raised in this org are filed under.
+                    <lightning-input
+                        class="slds-m-top_x-small"
+                        type="password"
+                        label="API Token"
+                        value={token}
+                        onchange={handleToken}
+                        placeholder={tokenPlaceholder}
+                    ></lightning-input>
+                    <p class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small">
+                        Needs <code>task:write</code> plus client/project read. Stored in this org only, never in code.
+                    </p>
+
+                    <div class="slds-m-top_small">
+                        <lightning-button
+                            variant="brand"
+                            label="Connect"
+                            onclick={saveConnection}
+                            disabled={savingConnection}
+                        ></lightning-button>
+                        <template if:true={canCancelConnection}>
+                            <lightning-button
+                                class="slds-m-left_x-small"
+                                label="Cancel"
+                                onclick={cancelConnection}
+                            ></lightning-button>
+                        </template>
+                    </div>
+                </div>
+            </template>
+
+            <!-- ===================== Mapping ===================== -->
+            <template if:true={showMapping}>
+                <div class="slds-text-title_caps slds-text-color_weak slds-m-top_medium slds-m-bottom_xx-small">
+                    2 · Ticket destination
+                </div>
+                <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_x-small">
+                    Which Veleiro client and project the tickets raised in this org are filed under.
                 </p>
 
                 <lightning-combobox
