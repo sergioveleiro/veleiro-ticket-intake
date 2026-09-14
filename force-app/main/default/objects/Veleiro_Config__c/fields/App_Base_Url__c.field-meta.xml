@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>App_Base_Url__c</fullName>
+    <label>App Base URL</label>
+    <type>Text</type>
+    <length>255</length>
+    <required>false</required>
+    <description>Your Veleiro portal address, used for the Open in Veleiro hyperlinks (for example https://app.veleiro.ai). Set it to the same Veleiro environment your Named Credential points to. If blank, the code uses a default.</description>
+    <inlineHelpText>Your Veleiro portal address for the Open in Veleiro links, e.g. https://app.veleiro.ai. Use the same environment your Named Credential points to.</inlineHelpText>
+</CustomField>

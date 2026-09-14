@@ -1,0 +1,86 @@
+<template>
+    <lightning-card icon-name="utility:new_window" title="Raise a ticket">
+        <div class="slds-p-horizontal_medium slds-p-bottom_medium">
+            <p class={destinationClass}>{destinationLabel}</p>
+
+            <lightning-input
+                class="slds-m-top_x-small"
+                label="Title"
+                required
+                data-field="title"
+                value={title}
+                onchange={handleField}
+                placeholder="Short summary of the issue"
+            ></lightning-input>
+
+            <lightning-textarea
+                class="slds-m-top_x-small"
+                label="Description"
+                data-field="description"
+                value={description}
+                onchange={handleField}
+                onpaste={handlePaste}
+                placeholder="What happened? Paste a screenshot here or attach one below."
+            ></lightning-textarea>
+
+            <div class="slds-grid slds-gutters_x-small slds-m-top_x-small">
+                <div class="slds-col">
+                    <lightning-combobox
+                        label="Type"
+                        data-field="type"
+                        value={type}
+                        options={typeOptions}
+                        onchange={handleField}
+                    ></lightning-combobox>
+                </div>
+                <div class="slds-col">
+                    <lightning-combobox
+                        label="Priority"
+                        data-field="priority"
+                        value={priority}
+                        options={priorityOptions}
+                        onchange={handleField}
+                    ></lightning-combobox>
+                </div>
+            </div>
+
+            <lightning-input
+                class="slds-m-top_x-small"
+                type="date"
+                label="Due date (optional)"
+                data-field="dueDate"
+                value={dueDate}
+                onchange={handleField}
+            ></lightning-input>
+
+            <div class="slds-m-top_x-small">
+                <label class="slds-form-element__label">Attachments</label>
+                <input type="file" multiple onchange={handleFiles} />
+                <template for:each={fileNames} for:item="f">
+                    <div key={f.key} class="slds-text-body_small slds-m-top_xxx-small">
+                        <lightning-icon icon-name="doc:attachment" size="x-small"></lightning-icon>
+                        <span class="slds-m-left_xx-small">{f.name}</span>
+                        <a data-idx={f.key} onclick={removeFile} class="slds-m-left_x-small">remove</a>
+                    </div>
+                </template>
+            </div>
+
+            <template if:true={hasContext}>
+                <div class="slds-box slds-box_xx-small slds-m-top_small slds-text-body_small slds-text-color_weak">
+                    <lightning-icon icon-name="utility:link" size="xx-small"></lightning-icon>
+                    <span class="slds-m-left_xx-small">Captured from: </span>
+                    <a href={sourceUrl} target="_blank">{sourceUrl}</a>
+                </div>
+            </template>
+
+            <div class="slds-m-top_medium">
+                <lightning-button
+                    variant="brand"
+                    label="Create ticket"
+                    onclick={submit}
+                    disabled={submitting}
+                ></lightning-button>
+            </div>
+        </div>
+    </lightning-card>
+</template>

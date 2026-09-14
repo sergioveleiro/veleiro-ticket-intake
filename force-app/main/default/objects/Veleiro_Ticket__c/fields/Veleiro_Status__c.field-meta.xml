@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Veleiro_Status__c</fullName>
+    <label>Veleiro Status</label>
+    <type>Text</type>
+    <length>64</length>
+    <required>false</required>
+    <description>The task's current stage/status name in Veleiro (for later two-way status sync).</description>
+</CustomField>

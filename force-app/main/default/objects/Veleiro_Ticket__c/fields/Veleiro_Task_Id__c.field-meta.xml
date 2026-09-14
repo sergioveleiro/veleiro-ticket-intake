@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Veleiro_Task_Id__c</fullName>
+    <label>Veleiro Task Id</label>
+    <type>Text</type>
+    <length>64</length>
+    <required>false</required>
+    <externalId>true</externalId>
+    <unique>true</unique>
+    <description>Id of the matching task in Veleiro. Set once the ticket is pushed. External Id so the record can be found by its Veleiro task.</description>
+</CustomField>

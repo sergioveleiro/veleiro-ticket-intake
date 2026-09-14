@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Api_Token__c</fullName>
+    <label>API Token</label>
+    <type>Text</type>
+    <length>255</length>
+    <required>false</required>
+    <description>Your Veleiro API token (Bearer). Stored as data, never in source code. This is the only value you must enter to connect. Needs task:write (plus client and project read).</description>
+    <inlineHelpText>Paste your Veleiro API token here (it starts with vlr_). Get it from your Veleiro account under API / developer settings, with write access to tasks and read access to clients and projects. This is the only required value.</inlineHelpText>
+</CustomField>

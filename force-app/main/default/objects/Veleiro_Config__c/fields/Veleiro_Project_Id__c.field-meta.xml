@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Veleiro_Project_Id__c</fullName>
+    <label>Veleiro Project Id</label>
+    <type>Text</type>
+    <length>64</length>
+    <required>false</required>
+    <description>Optional Veleiro project (project_id) that tickets are filed under. If blank, tasks are created at the client level with no project. Set in the Ticket Intake Setup panel.</description>
+    <inlineHelpText>Optional. The Veleiro project this org's tickets belong to. Leave blank to file tickets at the client level. Pick it in the Ticket Intake Setup panel.</inlineHelpText>
+</CustomField>

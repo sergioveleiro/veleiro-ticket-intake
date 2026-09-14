@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customSettingsType>Hierarchy</customSettingsType>
+    <description>Config de la integracion de intake de tickets con la API de Veleiro (token + base URL + a que client/project de Veleiro manda esta org). El token se inserta como DATO, no va en git.</description>
+    <label>Veleiro Config</label>
+    <visibility>Protected</visibility>
+</CustomObject>

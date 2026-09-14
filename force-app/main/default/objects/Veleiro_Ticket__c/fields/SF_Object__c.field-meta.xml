@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SF_Object__c</fullName>
+    <label>SF Object</label>
+    <type>Text</type>
+    <length>80</length>
+    <required>false</required>
+    <description>API name of the object the user was viewing (if any). Sent to Veleiro in additional_fields.sf_object.</description>
+</CustomField>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Veleiro_Client_Id__c</fullName>
+    <label>Veleiro Client Id</label>
+    <type>Text</type>
+    <length>64</length>
+    <required>false</required>
+    <description>The Veleiro client (client_id) that tickets raised in this org are filed under. Set once in the Ticket Intake Setup panel by picking a client from Veleiro.</description>
+    <inlineHelpText>The Veleiro client this org's tickets belong to. Pick it in the Ticket Intake Setup panel — don't type it by hand.</inlineHelpText>
+</CustomField>

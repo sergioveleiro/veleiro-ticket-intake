@@ -1,0 +1,57 @@
+<template>
+    <lightning-card icon-name="standard:settings" title="Ticket Intake Setup">
+        <div class="slds-p-horizontal_medium slds-p-bottom_medium">
+            <!-- Connection -->
+            <template if:true={notConnected}>
+                <div class="slds-box slds-theme_shade slds-m-bottom_small">
+                    <p class="slds-text-title_bold">Not connected to Veleiro</p>
+                    <p class="slds-text-body_small slds-m-top_xx-small">
+                        Paste your Veleiro API token (with <code>task:write</code> plus client/project read) in
+                        <b>Setup &gt; Custom Settings &gt; Veleiro Config &gt; Manage</b>, then reload this page.
+                    </p>
+                </div>
+            </template>
+
+            <template if:false={notConnected}>
+                <div class="slds-box slds-box_xx-small slds-m-bottom_small slds-text-body_small">
+                    <lightning-icon icon-name="utility:success" size="xx-small" variant="success"></lightning-icon>
+                    <span class="slds-m-left_xx-small">Connected · {environment}</span>
+                </div>
+
+                <p class="slds-text-body_regular slds-m-bottom_xx-small">
+                    Choose which Veleiro client and project the tickets raised in this org are filed under.
+                </p>
+
+                <lightning-combobox
+                    label="Veleiro Client"
+                    placeholder="Search clients…"
+                    value={selectedClient}
+                    options={clientOptions}
+                    onchange={handleClient}
+                ></lightning-combobox>
+
+                <lightning-combobox
+                    class="slds-m-top_x-small"
+                    label="Veleiro Project (optional)"
+                    placeholder="Pick a client first"
+                    value={selectedProject}
+                    options={projectOptions}
+                    onchange={handleProject}
+                ></lightning-combobox>
+
+                <div class="slds-m-top_medium">
+                    <lightning-button
+                        variant="brand"
+                        label="Save destination"
+                        onclick={save}
+                        disabled={loading}
+                    ></lightning-button>
+                </div>
+
+                <template if:true={loading}>
+                    <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                </template>
+            </template>
+        </div>
+    </lightning-card>
+</template>

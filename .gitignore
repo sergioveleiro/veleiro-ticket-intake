@@ -1,0 +1,26 @@
+# Salesforce / SFDX
+.sfdx/
+.sf/
+.localdevserver/
+deploy-options.json
+**/package.xml
+
+# Secrets — never commit tokens/credentials. The Veleiro API token lives ONLY as
+# data inside the Veleiro_Config__c custom setting in your org, never in source.
+*.key
+*.pem
+.env
+.env.*
+secrets.json
+auth/
+
+# Node / tooling
+node_modules/
+coverage/
+*.log
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+!.vscode/extensions.json

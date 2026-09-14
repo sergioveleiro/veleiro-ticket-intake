@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Veleiro_Task_Key__c</fullName>
+    <label>Veleiro Task Key</label>
+    <type>Text</type>
+    <length>64</length>
+    <required>false</required>
+    <description>Human-readable key of the matching Veleiro task (e.g. PROJ-123).</description>
+</CustomField>

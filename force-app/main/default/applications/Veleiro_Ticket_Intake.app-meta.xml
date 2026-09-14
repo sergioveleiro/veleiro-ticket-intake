@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Raise tickets from Salesforce that mirror as tasks in Veleiro.</description>
+    <formFactors>Large</formFactors>
+    <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
+    <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
+    <label>Veleiro Ticket Intake</label>
+    <navType>Standard</navType>
+    <tabs>Veleiro_Ticket__c</tabs>
+    <tabs>Veleiro_Ticket_Setup</tabs>
+    <uiType>Lightning</uiType>
+</CustomApplication>

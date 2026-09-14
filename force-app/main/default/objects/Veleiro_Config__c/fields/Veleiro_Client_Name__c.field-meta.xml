@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Veleiro_Client_Name__c</fullName>
+    <label>Veleiro Client Name</label>
+    <type>Text</type>
+    <length>255</length>
+    <required>false</required>
+    <description>Display name of the mapped Veleiro client (cached for the UI so we don't call the API just to show a label).</description>
+</CustomField>

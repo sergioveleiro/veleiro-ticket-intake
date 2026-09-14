@@ -1,0 +1,7 @@
+# Local-only files that should never deploy
+**/jsconfig.json
+**/.eslintrc.json
+**/__tests__/**
+
+# Profiles are org-specific — this kit ships access via a Permission Set instead
+**/profiles/**

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Base_Url__c</fullName>
+    <label>Base URL</label>
+    <type>Text</type>
+    <length>255</length>
+    <required>false</required>
+    <description>Veleiro API base path. Leave blank to use the default callout:Veleiro_API/api/v1, which routes through the Veleiro_API Named Credential. The Veleiro environment (host) is set on that Named Credential, not here.</description>
+    <inlineHelpText>Leave this blank (or callout:Veleiro_API/api/v1). It uses the Veleiro_API Named Credential — the Veleiro environment is controlled there, not in this field. Only change if Veleiro tells you to.</inlineHelpText>
+</CustomField>
