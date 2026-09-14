@@ -1,4 +1,48 @@
 :host {
+    --veleiro-navy: #040b25;
+    --veleiro-navy-hover: #0a1740;
+    --veleiro-accent: #cfe6f8;
+    --veleiro-line: #e7eef6;
+    --veleiro-muted: #5a6b82;
+
     display: block;
     max-width: 560px;
+}
+
+.velly-card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--veleiro-navy);
+    font-weight: 700;
+}
+.velly-mascot-sm {
+    height: 30px;
+    width: auto;
+    filter: drop-shadow(0 1px 3px rgba(4, 11, 37, 0.18));
+}
+.velly-accentbar {
+    height: 4px;
+    background: linear-gradient(90deg, var(--veleiro-navy) 0%, var(--veleiro-accent) 100%);
+    border-radius: 2px;
+    margin: 0 12px 8px 12px;
+}
+
+code {
+    background: #eef4fb;
+    border-radius: 4px;
+    padding: 0 4px;
+}
+
+/* Brand the primary buttons (SLDS styling hooks) */
+.velly-brand-btn {
+    --slds-c-button-brand-color-background: var(--veleiro-navy);
+    --slds-c-button-brand-color-border: var(--veleiro-navy);
+    --slds-c-button-brand-color-background-hover: var(--veleiro-navy-hover);
+    --slds-c-button-brand-color-border-hover: var(--veleiro-navy-hover);
+    --slds-c-button-brand-color-background-active: var(--veleiro-navy-hover);
+    --sds-c-button-brand-color-background: var(--veleiro-navy);
+    --sds-c-button-brand-color-border: var(--veleiro-navy);
+    --sds-c-button-brand-color-background-hover: var(--veleiro-navy-hover);
+    --sds-c-button-brand-color-border-hover: var(--veleiro-navy-hover);
 }

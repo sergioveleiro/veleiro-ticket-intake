@@ -1,6 +1,11 @@
 <template>
-    <lightning-card icon-name="standard:settings" title="Ticket Intake Setup">
-        <div class="slds-p-horizontal_medium slds-p-bottom_medium">
+    <lightning-card>
+        <div slot="title" class="velly-card-title">
+            <img src={mascot} alt="Velly" class="velly-mascot-sm" />
+            <span>Ticket Intake Setup</span>
+        </div>
+        <div class="velly-accentbar"></div>
+        <div class="slds-p-horizontal_medium slds-p-bottom_medium slds-p-top_x-small">
             <!-- ===================== Connection ===================== -->
             <div class="slds-text-title_caps slds-text-color_weak slds-m-bottom_xx-small">1 · Connection</div>
 
@@ -43,6 +48,7 @@
                             label="Connect"
                             onclick={saveConnection}
                             disabled={savingConnection}
+                            class="velly-brand-btn"
                         ></lightning-button>
                         <template if:true={canCancelConnection}>
                             <lightning-button
@@ -87,6 +93,7 @@
                         label="Save destination"
                         onclick={save}
                         disabled={loading}
+                        class="velly-brand-btn"
                     ></lightning-button>
                 </div>
 

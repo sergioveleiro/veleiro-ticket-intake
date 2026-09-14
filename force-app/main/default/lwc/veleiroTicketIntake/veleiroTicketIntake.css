@@ -1,8 +1,176 @@
 :host {
+    --veleiro-navy: #040b25;
+    --veleiro-navy-hover: #0a1740;
+    --veleiro-accent: #cfe6f8;
+    --veleiro-line: #e7eef6;
+    --veleiro-muted: #5a6b82;
+
     display: block;
-    max-width: 480px;
+    max-width: 460px;
 }
 
-a {
+.velly-surface {
+    background: #fff;
+    border: 1px solid var(--veleiro-line);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(4, 11, 37, 0.06);
+}
+
+/* Header */
+.velly-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px 10px 16px;
+}
+.velly-mascot {
+    height: 44px;
+    width: auto;
+    flex: none;
+    filter: drop-shadow(0 2px 5px rgba(4, 11, 37, 0.18));
+}
+.velly-header-text {
+    min-width: 0;
+}
+.velly-header-text h2 {
+    color: var(--veleiro-navy);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
+}
+.velly-header-text p {
+    margin: 2px 0 0 0;
+    font-size: 0.78rem;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+.velly-accentbar {
+    height: 4px;
+    background: linear-gradient(90deg, var(--veleiro-navy) 0%, var(--veleiro-accent) 100%);
+}
+
+.velly-body {
+    padding: 14px 16px 18px 16px;
+}
+
+.velly-label {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--veleiro-muted);
+    margin-bottom: 4px;
+}
+
+.velly-connected {
+    color: #2e844a;
+    font-weight: 600;
+}
+.velly-weak {
+    color: var(--veleiro-muted);
+}
+
+/* Dropzone */
+.velly-file-hidden {
+    display: none;
+}
+.velly-dropzone {
+    border: 1.5px dashed #b9cbe0;
+    border-radius: 12px;
+    background: #f7fafd;
+    padding: 16px 12px;
+    text-align: center;
     cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+.velly-dropzone:hover,
+.velly-dropzone_over {
+    border-color: var(--veleiro-navy);
+    background: #f2f8ff;
+}
+.velly-drop-icon {
+    --slds-c-icon-color-foreground-default: var(--veleiro-navy);
+}
+.velly-drop-text {
+    font-size: 0.85rem;
+    color: var(--veleiro-navy);
+    margin-top: 4px;
+}
+.velly-drop-hint {
+    font-size: 0.72rem;
+    color: var(--veleiro-muted);
+    margin-top: 2px;
+}
+.velly-link {
+    color: #04345e;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+/* File chips */
+.velly-file-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #eef4fb;
+    border: 1px solid var(--veleiro-line);
+    border-radius: 16px;
+    padding: 3px 10px;
+    margin: 8px 6px 0 0;
+    font-size: 0.78rem;
+    max-width: 100%;
+}
+.velly-file-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 240px;
+}
+.velly-file-remove {
+    cursor: pointer;
+    color: var(--veleiro-muted);
+    font-weight: 700;
+}
+.velly-file-remove:hover {
+    color: #ba0517;
+}
+
+/* Captured URL — must wrap inside the container */
+.velly-context {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 6px;
+    margin-top: 14px;
+    padding: 8px 10px;
+    background: #f7fafd;
+    border: 1px solid var(--veleiro-line);
+    border-radius: 8px;
+    font-size: 0.75rem;
+    color: var(--veleiro-muted);
+}
+.velly-context-label {
+    flex: none;
+}
+.velly-context-url {
+    color: #04345e;
+    word-break: break-all;
+    overflow-wrap: anywhere;
+    min-width: 0;
+}
+
+/* Brand the primary button (SLDS styling hooks) */
+.velly-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+.velly-brand-btn {
+    --slds-c-button-brand-color-background: var(--veleiro-navy);
+    --slds-c-button-brand-color-border: var(--veleiro-navy);
+    --slds-c-button-brand-color-background-hover: var(--veleiro-navy-hover);
+    --slds-c-button-brand-color-border-hover: var(--veleiro-navy-hover);
+    --slds-c-button-brand-color-background-active: var(--veleiro-navy-hover);
+    --sds-c-button-brand-color-background: var(--veleiro-navy);
+    --sds-c-button-brand-color-border: var(--veleiro-navy);
+    --sds-c-button-brand-color-background-hover: var(--veleiro-navy-hover);
+    --sds-c-button-brand-color-border-hover: var(--veleiro-navy-hover);
 }

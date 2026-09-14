@@ -1,6 +1,7 @@
 import { LightningElement, wire, track } from 'lwc';
 import { CurrentPageReference } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { MASCOT } from 'c/veleiroBrand';
 import getSetup from '@salesforce/apex/VeleiroTicketController.getSetup';
 import createTicket from '@salesforce/apex/VeleiroTicketController.createTicket';
 
@@ -34,6 +35,15 @@ export default class VeleiroTicketIntake extends LightningElement {
 
     typeOptions = TYPE_OPTIONS;
     priorityOptions = PRIORITY_OPTIONS;
+    dragOver = false;
+
+    get mascot() {
+        return MASCOT;
+    }
+
+    get dropzoneClass() {
+        return this.dragOver ? 'velly-dropzone velly-dropzone_over' : 'velly-dropzone';
+    }
 
     // Cuando el componente vive en una record page, aqui llega el contexto de forma confiable.
     @wire(CurrentPageReference)
@@ -88,9 +98,9 @@ export default class VeleiroTicketIntake extends LightningElement {
 
     get destinationClass() {
         if (this.setup && this.setup.connected && this.setup.clientId) {
-            return 'slds-text-color_success slds-text-body_small';
+            return 'velly-connected';
         }
-        return 'slds-text-color_weak slds-text-body_small';
+        return 'velly-weak';
     }
 
     get hasContext() {
@@ -111,7 +121,30 @@ export default class VeleiroTicketIntake extends LightningElement {
     }
 
     handleFiles(e) {
-        const list = e.target.files;
+        this.ingest(e.target.files);
+    }
+
+    triggerBrowse() {
+        const input = this.template.querySelector('input[type="file"]');
+        if (input) input.click();
+    }
+
+    onDragOver(e) {
+        e.preventDefault();
+        this.dragOver = true;
+    }
+
+    onDragLeave() {
+        this.dragOver = false;
+    }
+
+    onDrop(e) {
+        e.preventDefault();
+        this.dragOver = false;
+        this.ingest(e.dataTransfer && e.dataTransfer.files);
+    }
+
+    ingest(list) {
         if (!list || !list.length) return;
         const readers = [];
         for (const file of list) {

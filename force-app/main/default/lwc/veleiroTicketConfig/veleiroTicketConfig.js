@@ -1,5 +1,6 @@
 import { LightningElement, track } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { MASCOT } from 'c/veleiroBrand';
 import getSetup from '@salesforce/apex/VeleiroTicketController.getSetup';
 import saveToken from '@salesforce/apex/VeleiroTicketController.saveToken';
 import saveEnvironment from '@salesforce/apex/VeleiroTicketController.saveEnvironment';
@@ -30,6 +31,10 @@ export default class VeleiroTicketConfig extends LightningElement {
     selectedProject = '';
     selectedProjectName = '';
     loading = false;
+
+    get mascot() {
+        return MASCOT;
+    }
 
     connectedCallback() {
         this.refresh();
