@@ -4,7 +4,7 @@
     <label>Type</label>
     <type>Picklist</type>
     <required>false</required>
-    <description>Ticket type. Maps to the Veleiro task ticket_type.</description>
+    <description>Ticket type. Normalized to a valid Veleiro API type (task, story, …) in Apex before send.</description>
     <valueSet>
         <valueSetDefinition>
             <sorted>false</sorted>

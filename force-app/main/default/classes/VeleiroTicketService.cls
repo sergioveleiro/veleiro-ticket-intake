@@ -59,8 +59,8 @@ public with sharing class VeleiroTicketService {
             Map<String, Object> payload = new Map<String, Object>();
             payload.put('title', t.Title__c);
             payload.put('description', buildDescription(t));
-            putIf(payload, 'ticket_type', t.Ticket_Type__c);
-            putIf(payload, 'priority', t.Priority__c);
+            payload.put('ticket_type', normType(t.Ticket_Type__c));
+            payload.put('priority', normPriority(t.Priority__c));
             putIf(payload, 'client_id', t.Veleiro_Client_Id__c);
             putIf(payload, 'project_id', t.Veleiro_Project_Id__c);
             payload.put('additional_fields', af);
@@ -117,6 +117,31 @@ public with sharing class VeleiroTicketService {
 
     private static void putIf(Map<String, Object> m, String key, String val) {
         if (String.isNotBlank(val)) m.put(key, val);
+    }
+
+    // ---- Normalizacion a los valores que ACEPTA el API de Veleiro (descubiertos por probe) ----
+    // ticket_type validos: epic, story, task, decision, approval, review, deliverable, action_item, milestone, subtask
+    // priority validos: low, medium, high, critical  (OJO: "urgent" NO existe -> mapea a critical)
+    private static final Set<String> VALID_TYPES = new Set<String>{
+        'epic', 'story', 'task', 'decision', 'approval', 'review', 'deliverable', 'action_item', 'milestone', 'subtask'
+    };
+    private static final Set<String> VALID_PRIORITIES = new Set<String>{ 'low', 'medium', 'high', 'critical' };
+
+    private static String normPriority(String p) {
+        if (String.isBlank(p)) return 'medium';
+        String v = p.toLowerCase().trim();
+        if (v == 'urgent') return 'critical';
+        return VALID_PRIORITIES.contains(v) ? v : 'medium';
+    }
+
+    private static String normType(String t) {
+        if (String.isBlank(t)) return 'task';
+        String v = t.toLowerCase().trim().replace(' ', '_');
+        if (VALID_TYPES.contains(v)) return v;
+        Map<String, String> alias = new Map<String, String>{
+            'bug' => 'task', 'question' => 'task', 'feature' => 'story', 'other' => 'task'
+        };
+        return alias.containsKey(v) ? alias.get(v) : 'task';
     }
 
     private static Integer intOf(Object o) {

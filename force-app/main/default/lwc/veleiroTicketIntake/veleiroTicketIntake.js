@@ -5,6 +5,8 @@ import { MASCOT } from 'c/veleiroBrand';
 import getSetup from '@salesforce/apex/VeleiroTicketController.getSetup';
 import createTicket from '@salesforce/apex/VeleiroTicketController.createTicket';
 
+// Etiquetas amigables para el usuario final. VeleiroTicketService normaliza cada valor
+// al que ACEPTA el API de Veleiro (task/story/… y low/medium/high/critical) antes de enviar.
 const TYPE_OPTIONS = [
     { label: 'Task', value: 'Task' },
     { label: 'Bug', value: 'Bug' },

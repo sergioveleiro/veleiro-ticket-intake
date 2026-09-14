@@ -8,8 +8,8 @@ private class VeleiroTicketServiceTest {
         Veleiro_Ticket__c t = new Veleiro_Ticket__c(
             Title__c = 'No puedo guardar la cuenta',
             Description__c = 'Sale un error al guardar',
-            Ticket_Type__c = 'Bug',
-            Priority__c = 'High',
+            Ticket_Type__c = 'Bug',      // valor legacy -> debe normalizar a 'task'
+            Priority__c = 'Urgent',      // valor legacy -> debe normalizar a 'critical'
             Source_URL__c = 'https://x.lightning.force.com/lightning/r/Account/001000000000001/view',
             SF_Object__c = 'Account',
             SF_Record_Id__c = '001000000000001',
@@ -42,6 +42,8 @@ private class VeleiroTicketServiceTest {
 
         Map<String, Object> body = (Map<String, Object>) JSON.deserializeUntyped(mock.lastPostBody);
         System.assertEquals('org_test', body.get('client_id'));
+        System.assertEquals('critical', body.get('priority'), 'Urgent -> critical (valor valido del API)');
+        System.assertEquals('task', body.get('ticket_type'), 'Bug -> task (valor valido del API)');
         Map<String, Object> af = (Map<String, Object>) body.get('additional_fields');
         System.assertEquals('Account', af.get('sf_object'));
         System.assert(String.valueOf(af.get('sf_record_url')).contains('/Account/'), 'la URL viaja en additional_fields');

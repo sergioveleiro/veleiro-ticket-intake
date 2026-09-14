@@ -4,7 +4,7 @@
     <label>Priority</label>
     <type>Picklist</type>
     <required>false</required>
-    <description>Ticket priority. Maps to the Veleiro task priority.</description>
+    <description>Ticket priority. Normalized to the Veleiro API value (low/medium/high/critical) in Apex before send.</description>
     <valueSet>
         <valueSetDefinition>
             <sorted>false</sorted>
