@@ -8,7 +8,7 @@
  *  - 429 con Retry-After,
  *  - concurrencia con version / If-Match; 409 version_conflict trae detail.current_version.
  */
-public with sharing class VeleiroApiClient {
+public with sharing class VeleiroTicketApiClient {
 
     public class VeleiroApiException extends Exception {
         public String code;
@@ -16,40 +16,40 @@ public with sharing class VeleiroApiClient {
     }
 
     // Defaults NO-secretos: el partner solo tiene que pegar su token; base URLs caen a estos.
-    private static final String DEFAULT_BASE = 'callout:Veleiro_API/api/v1'; // via Named Credential Veleiro_API
+    private static final String DEFAULT_BASE = 'callout:Veleiro_Ticket_API/api/v1'; // via Named Credential Veleiro_Ticket_API
     private static final String DEFAULT_APP_BASE = 'https://app.veleiro.ai'; // produccion por defecto (beta: app.beta.veleiro.dev)
 
     // Lo UNICO obligatorio que el partner configura es el token (un secreto). Base_Url es opcional.
-    private static Veleiro_Config__c cfg() {
-        Veleiro_Config__c c = resolveConfig();
+    private static Veleiro_Ticket_Config__c cfg() {
+        Veleiro_Ticket_Config__c c = resolveConfig();
         if (c == null || String.isBlank(c.Api_Token__c)) {
-            throw new VeleiroApiException('Falta el token de Veleiro. Pega tu Api_Token__c en Setup > Custom Settings > Veleiro Config.');
+            throw new VeleiroApiException('Falta el token de Veleiro. Pega tu Api_Token__c en Setup > Custom Settings > Veleiro Ticket Config.');
         }
         return c;
     }
 
     // Resuelve la config SIN importar el nivel/"Location" (Org Default, Perfil o Usuario):
     // 1) getInstance() (jerarquia del usuario actual), 2) getOrgDefaults(), 3) cualquier registro con token.
-    private static Veleiro_Config__c resolveConfig() {
-        Veleiro_Config__c c = Veleiro_Config__c.getInstance();
+    private static Veleiro_Ticket_Config__c resolveConfig() {
+        Veleiro_Ticket_Config__c c = Veleiro_Ticket_Config__c.getInstance();
         if (c != null && String.isNotBlank(c.Api_Token__c)) return c;
-        c = Veleiro_Config__c.getOrgDefaults();
+        c = Veleiro_Ticket_Config__c.getOrgDefaults();
         if (c != null && String.isNotBlank(c.Api_Token__c)) return c;
-        List<Veleiro_Config__c> found = [
+        List<Veleiro_Ticket_Config__c> found = [
             SELECT Api_Token__c, Base_Url__c, App_Base_Url__c
-            FROM Veleiro_Config__c WHERE Api_Token__c != null LIMIT 1
+            FROM Veleiro_Ticket_Config__c WHERE Api_Token__c != null LIMIT 1
         ];
         return found.isEmpty() ? c : found[0];
     }
 
     // TRUE si hay un token configurado (en cualquier nivel). No expone el token.
     public static Boolean hasToken() {
-        Veleiro_Config__c c = resolveConfig();
+        Veleiro_Ticket_Config__c c = resolveConfig();
         return c != null && String.isNotBlank(c.Api_Token__c);
     }
 
     // Base de la API: usa la configurada si es valida; si viene vacia o malformada, cae al default.
-    private static String baseUrl(Veleiro_Config__c c) {
+    private static String baseUrl(Veleiro_Ticket_Config__c c) {
         String u = (c != null) ? c.Base_Url__c : null;
         if (String.isNotBlank(u) && (u.startsWith('callout:') || u.startsWithIgnoreCase('http'))) {
             return u;
@@ -59,7 +59,7 @@ public with sharing class VeleiroApiClient {
 
     // URL base humana del portal de Veleiro para los links "Open in Veleiro" (cualquier nivel de config).
     public static String appBaseUrl() {
-        Veleiro_Config__c c = resolveConfig();
+        Veleiro_Ticket_Config__c c = resolveConfig();
         String u = (c != null) ? c.App_Base_Url__c : null;
         return String.isNotBlank(u) ? u.removeEnd('/') : DEFAULT_APP_BASE;
     }
@@ -70,7 +70,7 @@ public with sharing class VeleiroApiClient {
     }
 
     private static HttpRequest baseReq(String method, String path) {
-        Veleiro_Config__c c = cfg();
+        Veleiro_Ticket_Config__c c = cfg();
         HttpRequest req = new HttpRequest();
         req.setEndpoint(baseUrl(c) + path); // el path NO lleva slash final
         req.setMethod(method);

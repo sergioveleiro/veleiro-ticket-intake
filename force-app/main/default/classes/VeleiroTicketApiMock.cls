@@ -3,7 +3,7 @@
  * Enruta por recurso (/clients, /projects, /tasks, /tasks/states) y metodo.
  */
 @isTest
-public class VeleiroApiMock implements HttpCalloutMock {
+public class VeleiroTicketApiMock implements HttpCalloutMock {
 
     public String clientsBody  = '{"data":[],"has_more":false}';
     public String projectsBody = '{"data":[],"has_more":false}';
@@ -54,9 +54,9 @@ public class VeleiroApiMock implements HttpCalloutMock {
         return res;
     }
 
-    // Inserta el Veleiro_Config__c org-default (token + mapping) para que las clases no truenen.
+    // Inserta el Veleiro_Ticket_Config__c org-default (token + mapping) para que las clases no truenen.
     public static void seedConfig() {
-        insert new Veleiro_Config__c(
+        insert new Veleiro_Ticket_Config__c(
             SetupOwnerId = UserInfo.getOrganizationId(),
             Api_Token__c = 'test-token',
             Base_Url__c  = 'https://test.veleiro.local/api/v1',

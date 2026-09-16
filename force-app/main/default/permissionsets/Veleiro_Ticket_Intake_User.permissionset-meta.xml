@@ -10,7 +10,7 @@
     </applicationVisibilities>
 
     <classAccesses>
-        <apexClass>VeleiroApiClient</apexClass>
+        <apexClass>VeleiroTicketApiClient</apexClass>
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>

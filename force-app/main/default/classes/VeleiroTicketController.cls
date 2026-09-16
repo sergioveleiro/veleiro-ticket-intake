@@ -2,7 +2,7 @@
  * Superficie @AuraEnabled para los LWC de intake y de configuracion.
  *  - getSetup: estado de conexion + a que client/project de Veleiro manda esta org.
  *  - listClients / listProjects: dropdowns del panel de mapping (callout, cacheable=false).
- *  - saveMapping: guarda el client/project destino en el Veleiro_Config__c org-default.
+ *  - saveMapping: guarda el client/project destino en el Veleiro_Ticket_Config__c org-default.
  *  - createTicket: inserta el ticket (+ adjuntos como Files) y encola el push a Veleiro.
  *
  * createTicket recibe el payload como STRING JSON y hace JSON.deserialize: evita el bug
@@ -24,12 +24,12 @@ public with sharing class VeleiroTicketController {
     @AuraEnabled(cacheable=false)
     public static SetupInfo getSetup() {
         SetupInfo s = new SetupInfo();
-        s.connected = VeleiroApiClient.hasToken();
-        String app = VeleiroApiClient.appBaseUrl();
+        s.connected = VeleiroTicketApiClient.hasToken();
+        String app = VeleiroTicketApiClient.appBaseUrl();
         s.appBase = app;
         s.environment = app.containsIgnoreCase('beta') ? 'Beta'
             : (app.containsIgnoreCase('app.veleiro.ai') ? 'Production' : 'Custom');
-        Veleiro_Config__c c = Veleiro_Config__c.getOrgDefaults();
+        Veleiro_Ticket_Config__c c = Veleiro_Ticket_Config__c.getOrgDefaults();
         if (c != null) {
             s.tokenMasked = maskToken(c.Api_Token__c);
             s.clientId = c.Veleiro_Client_Id__c;
@@ -44,30 +44,30 @@ public with sharing class VeleiroTicketController {
     @AuraEnabled
     public static void saveToken(String token) {
         if (String.isBlank(token)) return;
-        Veleiro_Config__c c = orgDefault();
+        Veleiro_Ticket_Config__c c = orgDefault();
         c.Api_Token__c = token.trim();
         upsert c;
     }
 
     // Cambia el entorno (Production / Beta) escribiendo Base_Url + App_Base_Url. NO toca el token.
-    // El host real lo enruta el Named Credential correspondiente (Veleiro_API / Veleiro_API_Beta).
+    // El host real lo enruta el Named Credential correspondiente (Veleiro_Ticket_API / Veleiro_Ticket_API_Beta).
     @AuraEnabled
     public static void saveEnvironment(String environment) {
-        Veleiro_Config__c c = orgDefault();
+        Veleiro_Ticket_Config__c c = orgDefault();
         if (environment == 'Beta') {
-            c.Base_Url__c = 'callout:Veleiro_API_Beta/api/v1';
+            c.Base_Url__c = 'callout:Veleiro_Ticket_API_Beta/api/v1';
             c.App_Base_Url__c = 'https://app.beta.veleiro.dev';
         } else { // Production (default)
-            c.Base_Url__c = 'callout:Veleiro_API/api/v1';
+            c.Base_Url__c = 'callout:Veleiro_Ticket_API/api/v1';
             c.App_Base_Url__c = 'https://app.veleiro.ai';
         }
         upsert c;
     }
 
-    private static Veleiro_Config__c orgDefault() {
-        Veleiro_Config__c c = Veleiro_Config__c.getOrgDefaults();
+    private static Veleiro_Ticket_Config__c orgDefault() {
+        Veleiro_Ticket_Config__c c = Veleiro_Ticket_Config__c.getOrgDefaults();
         if (c == null || c.Id == null) {
-            c = new Veleiro_Config__c(SetupOwnerId = UserInfo.getOrganizationId());
+            c = new Veleiro_Ticket_Config__c(SetupOwnerId = UserInfo.getOrganizationId());
         }
         return c;
     }
@@ -90,9 +90,9 @@ public with sharing class VeleiroTicketController {
 
     @AuraEnabled
     public static void saveMapping(String clientId, String clientName, String projectId, String projectName) {
-        Veleiro_Config__c c = Veleiro_Config__c.getOrgDefaults();
+        Veleiro_Ticket_Config__c c = Veleiro_Ticket_Config__c.getOrgDefaults();
         if (c == null || c.Id == null) {
-            c = new Veleiro_Config__c(SetupOwnerId = UserInfo.getOrganizationId());
+            c = new Veleiro_Ticket_Config__c(SetupOwnerId = UserInfo.getOrganizationId());
         }
         c.Veleiro_Client_Id__c = clientId;
         c.Veleiro_Client_Name__c = clientName;
@@ -107,7 +107,7 @@ public with sharing class VeleiroTicketController {
         if (inp == null || String.isBlank(inp.title)) {
             throw new AuraHandledException('El titulo es obligatorio.');
         }
-        Veleiro_Config__c c = Veleiro_Config__c.getOrgDefaults();
+        Veleiro_Ticket_Config__c c = Veleiro_Ticket_Config__c.getOrgDefaults();
 
         Veleiro_Ticket__c t = new Veleiro_Ticket__c();
         t.Title__c = trunc(inp.title, 255);
@@ -128,6 +128,16 @@ public with sharing class VeleiroTicketController {
             t.Veleiro_Client_Id__c = c.Veleiro_Client_Id__c;
             t.Veleiro_Project_Id__c = c.Veleiro_Project_Id__c;
         }
+        // Con veleiro-salesforce-kit, un registro ya vinculado manda el ticket a su client/project.
+        VeleiroTicketRouting.Target route = VeleiroTicketRouting.forRecord(t.SF_Record_Id__c);
+        if (route != null) {
+            // El project configurado solo aplica si es del mismo client.
+            if (route.projectId == null && route.clientId == t.Veleiro_Client_Id__c) {
+                route.projectId = t.Veleiro_Project_Id__c;
+            }
+            t.Veleiro_Client_Id__c = route.clientId;
+            t.Veleiro_Project_Id__c = route.projectId;
+        }
         insert t;
 
         if (inp.files != null && !inp.files.isEmpty()) {
@@ -135,7 +145,7 @@ public with sharing class VeleiroTicketController {
         }
 
         // Push async solo si hay token; si no, el ticket queda guardado en Salesforce.
-        if (VeleiroApiClient.hasToken()) {
+        if (VeleiroTicketApiClient.hasToken()) {
             System.enqueueJob(new VeleiroTicketPushQueueable(t.Id));
         }
         return t.Id;

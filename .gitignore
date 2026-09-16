@@ -6,7 +6,7 @@ deploy-options.json
 **/package.xml
 
 # Secrets — never commit tokens/credentials. The Veleiro API token lives ONLY as
-# data inside the Veleiro_Config__c custom setting in your org, never in source.
+# data inside the Veleiro_Ticket_Config__c custom setting in your org, never in source.
 *.key
 *.pem
 .env

@@ -2,7 +2,7 @@
 private class VeleiroTicketServiceTest {
 
     @testSetup
-    static void setup() { VeleiroApiMock.seedConfig(); }
+    static void setup() { VeleiroTicketApiMock.seedConfig(); }
 
     private static Veleiro_Ticket__c newTicket(Boolean withDue) {
         Veleiro_Ticket__c t = new Veleiro_Ticket__c(
@@ -25,7 +25,7 @@ private class VeleiroTicketServiceTest {
     @isTest
     static void pushCreatesTaskAndMatch() {
         Veleiro_Ticket__c t = newTicket(false);
-        VeleiroApiMock mock = new VeleiroApiMock();
+        VeleiroTicketApiMock mock = new VeleiroTicketApiMock();
         Test.setMock(HttpCalloutMock.class, mock);
         Test.startTest();
         VeleiroTicketService.pushTicket(t.Id);
@@ -52,7 +52,7 @@ private class VeleiroTicketServiceTest {
     @isTest
     static void pushWithDueDatePatches() {
         Veleiro_Ticket__c t = newTicket(true);
-        VeleiroApiMock mock = new VeleiroApiMock();
+        VeleiroTicketApiMock mock = new VeleiroTicketApiMock();
         Test.setMock(HttpCalloutMock.class, mock);
         Test.startTest();
         VeleiroTicketService.pushTicket(t.Id);
@@ -67,7 +67,7 @@ private class VeleiroTicketServiceTest {
     @isTest
     static void pushRecordsErrorOnInsufficientScope() {
         Veleiro_Ticket__c t = newTicket(false);
-        VeleiroApiMock mock = new VeleiroApiMock();
+        VeleiroTicketApiMock mock = new VeleiroTicketApiMock();
         mock.overrideStatus = 403;
         mock.overrideBody = '{"error":{"code":"insufficient_scope","message":"task scope required"}}';
         Test.setMock(HttpCalloutMock.class, mock);
@@ -82,7 +82,7 @@ private class VeleiroTicketServiceTest {
 
     @isTest
     static void listsClientsAndProjects() {
-        VeleiroApiMock mock = new VeleiroApiMock();
+        VeleiroTicketApiMock mock = new VeleiroTicketApiMock();
         mock.clientsBody = '{"data":[{"id":"org_test","name":"Colfondos","is_archived":false},{"id":"org_arch","name":"Old","is_archived":true}],"has_more":false}';
         mock.projectsBody = '{"data":[{"id":"prjct_test","name":"Implementation","client_id":"org_test","is_archived":false},{"id":"prjct_x","name":"Otro","client_id":"org_other","is_archived":false}],"has_more":false}';
         Test.setMock(HttpCalloutMock.class, mock);

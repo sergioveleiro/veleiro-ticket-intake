@@ -6,7 +6,24 @@ Salesforce org (e.g. a delivery engagement) so their users can file issues witho
 leaving Salesforce — the page URL and record context travel with the ticket.
 
 This is a **separate product** from `veleiro-salesforce-kit` (which is the sales-motion
-integration for a partner's own org). It reuses the same proven Veleiro API plumbing.
+integration for a partner's own org). Each installs on its own, in any order, and they can
+live in the same org without clashing: every component here has its own `VeleiroTicket*` /
+`Veleiro_Ticket_*` name, including its own config, token and Named Credentials.
+
+### Works better with the kit (optional)
+
+If `veleiro-salesforce-kit` is installed and a ticket is raised from a record it already
+linked, the ticket is filed under that record's Veleiro client/project instead of the
+default from the setup panel:
+
+| Raised from | Filed under |
+|---|---|
+| Opportunity with `Veleiro_Project_Id__c` | its project, and its Account's client |
+| Account with `Veleiro_Client_Id__c` | that client (the configured project only if it's the same client) |
+| Any record with an `AccountId` (Contact, Case, …) | its Account's client |
+| Anything else, or no kit | the configured client/project |
+
+The kit fields are read dynamically (`VeleiroTicketRouting`), so there is no dependency.
 
 ## What it does
 
@@ -30,21 +47,26 @@ integration for a partner's own org). It reuses the same proven Veleiro API plum
 - ⚠️ The API token needs **`task:write`** plus **client/project read**. Grant it in the
   Veleiro portal before the push works (`GET /api/v1/me` must show `task.level = write`).
 
-## Install (scratch/dev)
+## Install
 
 ```bash
-sf org create scratch -f config/project-scratch-def.json -a VeleiroTicketDev -d 30
-sf project deploy start -o VeleiroTicketDev
-sf org assign permset -n Veleiro_Ticket_Intake_User -o VeleiroTicketDev
-# then paste your token: Setup > Custom Settings > Veleiro Config > Manage (Api_Token__c)
-sf org open -o VeleiroTicketDev
+# Deploy (runs only this package's tests; add --validate for a dry run)
+scripts/deploy.sh <org>
+sf org assign permset -n Veleiro_Ticket_Intake_User -o <org>
+# then connect from the Veleiro Ticket Setup tab (token + Production/Beta)
 ```
+
+Deploying from the Veleiro platform instead? Pick **Run specified tests** with
+`VeleiroTicketControllerTest, VeleiroTicketRoutingTest, VeleiroTicketServiceTest`.
+Don't use Run local tests: it runs every test in the org, including code you don't own.
+
+For a scratch org: `sf org create scratch -f config/project-scratch-def.json -a VeleiroTicketDev -d 30`.
 
 Add the `Veleiro Ticket Intake` component to any Lightning app's **Utility Bar**
 (App Manager → Edit → Utility Items) so it's reachable from anywhere.
 
 ## Config lives as data, not source
 
-The API token is stored only in the `Veleiro_Config__c` protected custom setting in the
-org — never in git. Base URL / environment is controlled by the `Veleiro_API`
-(prod) or `Veleiro_API_Beta` Named Credential.
+The API token is stored only in the `Veleiro_Ticket_Config__c` custom setting in the
+org — never in git. Base URL / environment is controlled by the `Veleiro_Ticket_API`
+(prod) or `Veleiro_Ticket_API_Beta` Named Credential.

@@ -2,7 +2,7 @@
 private class VeleiroTicketControllerTest {
 
     @testSetup
-    static void setup() { VeleiroApiMock.seedConfig(); }
+    static void setup() { VeleiroTicketApiMock.seedConfig(); }
 
     @isTest
     static void getSetupReturnsMapping() {
@@ -20,7 +20,7 @@ private class VeleiroTicketControllerTest {
         Test.startTest();
         VeleiroTicketController.saveMapping('org_new', 'New Client', 'prj_new', 'New Project');
         Test.stopTest();
-        Veleiro_Config__c c = Veleiro_Config__c.getOrgDefaults();
+        Veleiro_Ticket_Config__c c = Veleiro_Ticket_Config__c.getOrgDefaults();
         System.assertEquals('org_new', c.Veleiro_Client_Id__c);
         System.assertEquals('New Client', c.Veleiro_Client_Name__c);
         System.assertEquals('prj_new', c.Veleiro_Project_Id__c);
@@ -31,13 +31,13 @@ private class VeleiroTicketControllerTest {
         Test.startTest();
         VeleiroTicketController.saveMapping('org_new', 'New Client', '', '');
         Test.stopTest();
-        Veleiro_Config__c c = Veleiro_Config__c.getOrgDefaults();
+        Veleiro_Ticket_Config__c c = Veleiro_Ticket_Config__c.getOrgDefaults();
         System.assertEquals(null, c.Veleiro_Project_Id__c);
     }
 
     @isTest
     static void createTicketInsertsAttachesAndSends() {
-        VeleiroApiMock mock = new VeleiroApiMock();
+        VeleiroTicketApiMock mock = new VeleiroTicketApiMock();
         Test.setMock(HttpCalloutMock.class, mock);
         String b64 = EncodingUtil.base64Encode(Blob.valueOf('fake-image-bytes'));
         Map<String, Object> payload = new Map<String, Object>{
@@ -67,6 +67,43 @@ private class VeleiroTicketControllerTest {
         System.assertEquals(1, links, 'el adjunto quedo ligado al ticket');
     }
 
+    // Con el kit, un ticket desde un registro vinculado va a su client (campos estandar en el test).
+    private static Veleiro_Ticket__c ticketFrom(Id recordId) {
+        VeleiroTicketRouting.clientField = 'AccountNumber';
+        VeleiroTicketRouting.projectField = 'NextStep';
+        Id ticketId = VeleiroTicketController.createTicket(JSON.serialize(new Map<String, Object>{
+            'title' => 'Desde registro', 'sfRecordId' => recordId
+        }));
+        return [SELECT Veleiro_Client_Id__c, Veleiro_Project_Id__c FROM Veleiro_Ticket__c WHERE Id = :ticketId];
+    }
+
+    @isTest
+    static void createTicketRoutesToLinkedClient() {
+        Account a = new Account(Name = 'Linked', AccountNumber = 'org_linked');
+        insert a;
+        Veleiro_Ticket__c t = ticketFrom(a.Id);
+        System.assertEquals('org_linked', t.Veleiro_Client_Id__c);
+        System.assertEquals(null, t.Veleiro_Project_Id__c, 'el project configurado es de otro client');
+    }
+
+    @isTest
+    static void createTicketKeepsConfiguredProjectForSameClient() {
+        Account a = new Account(Name = 'Configured', AccountNumber = 'org_test');
+        insert a;
+        Veleiro_Ticket__c t = ticketFrom(a.Id);
+        System.assertEquals('org_test', t.Veleiro_Client_Id__c);
+        System.assertEquals('prjct_test', t.Veleiro_Project_Id__c);
+    }
+
+    @isTest
+    static void createTicketUsesDefaultWhenUnlinked() {
+        Account a = new Account(Name = 'Unlinked');
+        insert a;
+        Veleiro_Ticket__c t = ticketFrom(a.Id);
+        System.assertEquals('org_test', t.Veleiro_Client_Id__c);
+        System.assertEquals('prjct_test', t.Veleiro_Project_Id__c);
+    }
+
     @isTest
     static void createTicketRequiresTitle() {
         Boolean threw = false;
@@ -82,7 +119,7 @@ private class VeleiroTicketControllerTest {
 
     @isTest
     static void listClientsAndProjectsViaController() {
-        VeleiroApiMock mock = new VeleiroApiMock();
+        VeleiroTicketApiMock mock = new VeleiroTicketApiMock();
         mock.clientsBody = '{"data":[{"id":"org_test","name":"Colfondos"}],"has_more":false}';
         mock.projectsBody = '{"data":[{"id":"prjct_test","name":"Impl","client_id":"org_test"}],"has_more":false}';
         Test.setMock(HttpCalloutMock.class, mock);

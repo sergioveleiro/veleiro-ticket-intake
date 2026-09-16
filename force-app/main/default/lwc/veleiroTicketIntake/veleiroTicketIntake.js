@@ -1,7 +1,7 @@
 import { LightningElement, wire, track } from 'lwc';
 import { CurrentPageReference } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-import { MASCOT } from 'c/veleiroBrand';
+import { MASCOT } from 'c/veleiroTicketBrand';
 import getSetup from '@salesforce/apex/VeleiroTicketController.getSetup';
 import createTicket from '@salesforce/apex/VeleiroTicketController.createTicket';
 

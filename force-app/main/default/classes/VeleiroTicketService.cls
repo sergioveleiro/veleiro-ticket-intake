@@ -17,7 +17,7 @@ public with sharing class VeleiroTicketService {
 
     public static List<Option> listClients() {
         List<Option> out = new List<Option>();
-        for (Object o : VeleiroApiClient.listAll('/clients', null)) {
+        for (Object o : VeleiroTicketApiClient.listAll('/clients', null)) {
             Map<String, Object> c = (Map<String, Object>) o;
             if (c.get('is_archived') == true) continue;
             out.add(new Option((String) c.get('id'), (String) c.get('name')));
@@ -27,7 +27,7 @@ public with sharing class VeleiroTicketService {
 
     public static List<Option> listProjects(String clientId) {
         List<Option> out = new List<Option>();
-        for (Object o : VeleiroApiClient.listAll('/projects', null)) {
+        for (Object o : VeleiroTicketApiClient.listAll('/projects', null)) {
             Map<String, Object> p = (Map<String, Object>) o;
             if (p.get('is_archived') == true) continue;
             if (String.isNotBlank(clientId) && clientId != (String) p.get('client_id')) continue;
@@ -65,14 +65,14 @@ public with sharing class VeleiroTicketService {
             putIf(payload, 'project_id', t.Veleiro_Project_Id__c);
             payload.put('additional_fields', af);
 
-            Map<String, Object> task = VeleiroApiClient.doPost('/tasks', payload);
+            Map<String, Object> task = VeleiroTicketApiClient.doPost('/tasks', payload);
             String taskId = (String) task.get('id');
             Integer version = intOf(task.get('version'));
 
             // due_date NO va en create -> PATCH aparte (If-Match con la version recien creada).
             if (t.Due_Date__c != null && String.isNotBlank(taskId)) {
                 Map<String, Object> patch = new Map<String, Object>{ 'due_date' => String.valueOf(t.Due_Date__c) };
-                Map<String, Object> updated = VeleiroApiClient.doPatch('/tasks/' + taskId, patch, version);
+                Map<String, Object> updated = VeleiroTicketApiClient.doPatch('/tasks/' + taskId, patch, version);
                 if (updated != null) {
                     task = updated;
                     version = intOf(task.get('version'));
@@ -108,7 +108,7 @@ public with sharing class VeleiroTicketService {
     }
 
     private static String taskUrl(Veleiro_Ticket__c t) {
-        String base = VeleiroApiClient.appBaseUrl();
+        String base = VeleiroTicketApiClient.appBaseUrl();
         if (String.isNotBlank(t.Veleiro_Client_Id__c)) {
             return base + '/a/partner-portal/organizations/' + t.Veleiro_Client_Id__c;
         }

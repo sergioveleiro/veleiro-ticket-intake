@@ -1,6 +1,6 @@
 import { LightningElement, track } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-import { MASCOT } from 'c/veleiroBrand';
+import { MASCOT } from 'c/veleiroTicketBrand';
 import getSetup from '@salesforce/apex/VeleiroTicketController.getSetup';
 import saveToken from '@salesforce/apex/VeleiroTicketController.saveToken';
 import saveEnvironment from '@salesforce/apex/VeleiroTicketController.saveEnvironment';
