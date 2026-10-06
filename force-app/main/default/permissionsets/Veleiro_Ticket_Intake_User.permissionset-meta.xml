@@ -37,6 +37,11 @@
     </objectPermissions>
 
     <!-- Title__c is a required field: its FLS is implicit and cannot be set in a permission set. -->
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Veleiro_Ticket__c.Attachment_Note__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
     <fieldPermissions><field>Veleiro_Ticket__c.Description__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
     <fieldPermissions><field>Veleiro_Ticket__c.Ticket_Type__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
     <fieldPermissions><field>Veleiro_Ticket__c.Priority__c</field><readable>true</readable><editable>true</editable></fieldPermissions>

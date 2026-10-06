@@ -32,15 +32,21 @@ private class VeleiroTicketRoutingTest {
         System.assertEquals('prjct_linked', t.projectId);
     }
 
+    // Cualquier registro con lookup a Account hereda su client. Se prueba con Opportunity
+    // y no con Contact: las reglas de validacion del cliente sobre objetos estandar pueden
+    // tumbar el deploy, y los tests de Apex no pueden saltarselas.
     @isTest
-    static void contactRoutesThroughItsAccount() {
+    static void anyRecordWithAnAccountRoutesThroughIt() {
         useStandardFields();
         Account a = new Account(Name = 'Linked', AccountNumber = 'org_linked');
         insert a;
-        Contact c = new Contact(LastName = 'Doe', AccountId = a.Id);
-        insert c;
+        Opportunity o = new Opportunity(Name = 'Sin project', StageName = 'Prospecting',
+            CloseDate = Date.today(), AccountId = a.Id); // sin NextStep -> sin project
+        insert o;
 
-        System.assertEquals('org_linked', VeleiroTicketRouting.forRecord(c.Id).clientId);
+        VeleiroTicketRouting.Target t = VeleiroTicketRouting.forRecord(o.Id);
+        System.assertEquals('org_linked', t.clientId);
+        System.assertEquals(null, t.projectId);
     }
 
     @isTest

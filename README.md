@@ -47,6 +47,11 @@ The kit fields are read dynamically (`VeleiroTicketRouting`), so there is no dep
 - ⚠️ The API token needs **`task:write`** plus **client/project read**. Grant it in the
   Veleiro portal before the push works (`GET /api/v1/me` must show `task.level = write`).
 
+## If something fails
+
+- A ticket that couldn't reach Veleiro stays in **Error** with the reason in `Sync_Error__c`. Fix the cause (usually the token or its `task:write` scope) and use the **Resend ticket to Veleiro** action on the record — no need to file it again.
+- Files over 4 MB aren't attached; the ticket is still created and says so in `Attachment note`.
+
 ## Install
 
 ```bash

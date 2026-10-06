@@ -128,4 +128,61 @@ private class VeleiroTicketControllerTest {
         System.assertEquals(1, VeleiroTicketController.listProjects('org_test').size());
         Test.stopTest();
     }
+
+    @isTest
+    static void aFileTooBigDoesNotCostTheTicket() {
+        VeleiroTicketController.maxFileBytes = 10; // cualquier archivo pasa a ser "grande"
+        VeleiroTicketApiMock mock = new VeleiroTicketApiMock();
+        Test.setMock(HttpCalloutMock.class, mock);
+        String b64 = EncodingUtil.base64Encode(Blob.valueOf('bytes de una captura grande'));
+
+        Test.startTest();
+        Id ticketId = VeleiroTicketController.createTicket(JSON.serialize(new Map<String, Object>{
+            'title' => 'Con adjunto pesado',
+            'files' => new List<Object>{ new Map<String, Object>{ 'name' => 'grande.png', 'base64' => b64 } }
+        }));
+        Test.stopTest();
+
+        Veleiro_Ticket__c t = [SELECT Title__c, Status__c, Attachment_Note__c FROM Veleiro_Ticket__c WHERE Id = :ticketId];
+        System.assertEquals('Con adjunto pesado', t.Title__c, 'el ticket se guarda igual');
+        System.assertEquals('Sent', t.Status__c, 'y se envia a Veleiro');
+        System.assert(t.Attachment_Note__c != null && t.Attachment_Note__c.contains('grande.png'),
+            'queda dicho que ese archivo no se adjunto: ' + t.Attachment_Note__c);
+        System.assertEquals(0, [SELECT COUNT() FROM ContentDocumentLink WHERE LinkedEntityId = :ticketId]);
+    }
+
+    @isTest
+    static void retryResendsATicketThatFailed() {
+        Veleiro_Ticket__c t = new Veleiro_Ticket__c(
+            Title__c = 'Fallo antes', Status__c = 'Error', Sync_Error__c = 'invalid_token'
+        );
+        insert t;
+        VeleiroTicketApiMock mock = new VeleiroTicketApiMock();
+        Test.setMock(HttpCalloutMock.class, mock);
+
+        Test.startTest();
+        VeleiroTicketController.retryPush(t.Id);
+        Test.stopTest(); // el Queueable corre aqui
+
+        Veleiro_Ticket__c after = [SELECT Status__c, Sync_Error__c, Veleiro_Task_Id__c FROM Veleiro_Ticket__c WHERE Id = :t.Id];
+        System.assertEquals('Sent', after.Status__c);
+        System.assertEquals('task_test', after.Veleiro_Task_Id__c, 'se reenvia el mismo ticket, no se crea otro');
+        System.assertEquals(null, after.Sync_Error__c, 'se limpia el error anterior');
+        System.assertEquals(1, [SELECT COUNT() FROM Veleiro_Ticket__c]);
+    }
+
+    @isTest
+    static void retryNeedsATicketAndAToken() {
+        Boolean threwWithoutTicket = false;
+        try { VeleiroTicketController.retryPush(null); } catch (Exception e) { threwWithoutTicket = true; }
+        System.assertEquals(true, threwWithoutTicket);
+
+        // Sin token configurado, avisa en vez de encolar un envio que fallaria.
+        delete [SELECT Id FROM Veleiro_Ticket_Config__c];
+        Veleiro_Ticket__c t = new Veleiro_Ticket__c(Title__c = 'Sin conexion', Status__c = 'Error');
+        insert t;
+        Boolean threwWithoutToken = false;
+        try { VeleiroTicketController.retryPush(t.Id); } catch (Exception e) { threwWithoutToken = true; }
+        System.assertEquals(true, threwWithoutToken);
+    }
 }

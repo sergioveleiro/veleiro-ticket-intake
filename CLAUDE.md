@@ -28,6 +28,12 @@ Never add a component whose API name exists in the kit (`VeleiroApi*`, `Veleiro_
 - `veleiroTicketIntake` LWC: utility bar + record page. URL via `window.location.href`; record/object via `CurrentPageReference` or URL parse. Files read client-side to base64.
 - `veleiroTicketConfig` LWC: connect (token, Production/Beta) + map default client/project.
 
+## Guards (don't remove them)
+
+- **A failing attachment must never cost the ticket.** `createTicket` saves the ticket first and attaches afterwards inside a try/catch; files over `maxFileBytes` (4 MB) are skipped and named in `Attachment_Note__c`, a field separate from `Sync_Error__c` so a successful push doesn't wipe the warning.
+- **`retryPush` resends a failed ticket** instead of making the user file a new one; it clears the error and re-enqueues the same record.
+- **Tests never insert Contacts or Cases.** A partner org rejected Contact inserts with its own validation rule and rolled back a whole deploy of the sibling kit; Apex tests can't bypass validation rules. Use Account and Opportunity only.
+
 ## Hard facts (don't relearn these)
 
 - The Veleiro API has **no file upload** endpoint. Screenshots stay in Salesforce Files; only context goes to Veleiro via `additional_fields`.

@@ -140,8 +140,15 @@ public with sharing class VeleiroTicketController {
         }
         insert t;
 
+        // Los adjuntos son accesorios: si fallan (tamaño, permisos de Files), el ticket se
+        // conserva igual y el usuario no pierde lo que escribio.
         if (inp.files != null && !inp.files.isEmpty()) {
-            attachFiles(t.Id, inp.files);
+            try {
+                attachFiles(t.Id, inp.files);
+            } catch (Exception e) {
+                t.Attachment_Note__c = e.getMessage().abbreviate(255);
+                update t;
+            }
         }
 
         // Push async solo si hay token; si no, el ticket queda guardado en Salesforce.
@@ -151,15 +158,29 @@ public with sharing class VeleiroTicketController {
         return t.Id;
     }
 
+    // Salesforce corta un archivo subido por Apex alrededor de 4.3 MB; por encima de eso el
+    // insert falla entero. Se descartan los pesados en vez de arriesgar el ticket completo.
+    @TestVisible private static Integer maxFileBytes = 4 * 1024 * 1024;
+
     private static void attachFiles(Id ticketId, List<FileInput> files) {
         List<ContentVersion> cvs = new List<ContentVersion>();
+        List<String> skipped = new List<String>();
         for (FileInput f : files) {
             if (f == null || String.isBlank(f.base64)) continue;
+            // base64 ocupa ~4/3 del binario real.
+            if (f.base64.length() * 3 / 4 > maxFileBytes) {
+                skipped.add(String.isBlank(f.name) ? 'attachment' : f.name);
+                continue;
+            }
             ContentVersion cv = new ContentVersion();
             cv.Title = String.isBlank(f.name) ? 'attachment' : f.name;
             cv.PathOnClient = cv.Title;
             cv.VersionData = EncodingUtil.base64Decode(f.base64);
             cvs.add(cv);
+        }
+        if (!skipped.isEmpty()) {
+            throw new VeleiroTicketApiClient.VeleiroApiException(
+                'File too large (max 4 MB): ' + String.join(skipped, ', '));
         }
         if (cvs.isEmpty()) return;
         insert cvs;
@@ -175,6 +196,21 @@ public with sharing class VeleiroTicketController {
             ));
         }
         insert links;
+    }
+
+    // Reintenta el envio de un ticket que quedo en Error (token vencido, permisos, caida).
+    // El registro ya existe: no se duplica nada, solo se vuelve a empujar.
+    @AuraEnabled
+    public static void retryPush(Id ticketId) {
+        if (ticketId == null) throw new AuraHandledException('Missing ticket.');
+        if (!VeleiroTicketApiClient.hasToken()) {
+            throw new AuraHandledException('Connect Veleiro first in the Veleiro Ticket Setup tab.');
+        }
+        Veleiro_Ticket__c t = [SELECT Id, Status__c FROM Veleiro_Ticket__c WHERE Id = :ticketId LIMIT 1];
+        t.Status__c = 'New';
+        t.Sync_Error__c = null;
+        update t;
+        System.enqueueJob(new VeleiroTicketPushQueueable(t.Id));
     }
 
     private static String trunc(String s, Integer n) {
