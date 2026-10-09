@@ -1,12 +1,19 @@
 {
   "packageDirectories": [
     {
+      "versionName": "Primera version administrada",
+      "versionNumber": "1.0.0.NEXT",
       "path": "force-app",
-      "default": true
+      "default": true,
+      "package": "Veleiro Ticket Intake",
+      "versionDescription": "Raise a ticket from anywhere in Salesforce and mirror it as a task in Veleiro."
     }
   ],
   "name": "veleiro-ticket-intake",
-  "namespace": "",
+  "namespace": "veleiro",
   "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "62.0"
+  "sourceApiVersion": "62.0",
+  "packageAliases": {
+    "Veleiro Ticket Intake": "0HoPe00000003U9KAI"
+  }
 }

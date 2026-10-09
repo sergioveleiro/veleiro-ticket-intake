@@ -5,7 +5,7 @@
         <type>Region</type>
         <itemInstances>
             <componentInstance>
-                <componentName>veleiroTicketConfig</componentName>
+                <componentName>veleiro:veleiroTicketConfig</componentName>
                 <identifier>veleiroTicketConfig1</identifier>
             </componentInstance>
         </itemInstances>
