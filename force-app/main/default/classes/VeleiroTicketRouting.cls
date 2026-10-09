@@ -17,32 +17,35 @@ public with sharing class VeleiroTicketRouting {
     // Campos del kit. @TestVisible para que los tests usen campos estandar en orgs sin el kit.
     @TestVisible private static String clientField = 'Veleiro_Client_Id__c';
     @TestVisible private static String projectField = 'Veleiro_Project_Id__c';
+    // El kit puede estar instalado como paquete administrado: ahi sus campos llevan prefijo.
+    private static final String KIT_NAMESPACE = 'veleiro__';
 
     // Nunca truena: ante cualquier problema devuelve null y el ticket usa el default.
     public static Target forRecord(String recordId) {
         try {
             Id rid = Id.valueOf(recordId);
             String obj = rid.getSobjectType().getDescribe().getName();
-            if (!hasField('Account', clientField)) return null; // kit no instalado
+            String clientApi = resolveField('Account', clientField);
+            if (clientApi == null) return null; // kit no instalado
 
             String clientExpr;
             if (obj == 'Account') {
-                clientExpr = clientField;
+                clientExpr = clientApi;
             } else if (hasField(obj, 'AccountId')) {
-                clientExpr = 'Account.' + clientField;
+                clientExpr = 'Account.' + clientApi;
             } else {
                 return null;
             }
-            Boolean withProject = obj == 'Opportunity' && hasField('Opportunity', projectField);
-            String soql = 'SELECT ' + clientExpr + (withProject ? ', ' + projectField : '') +
+            String projectApi = (obj == 'Opportunity') ? resolveField('Opportunity', projectField) : null;
+            String soql = 'SELECT ' + clientExpr + (projectApi != null ? ', ' + projectApi : '') +
                           ' FROM ' + obj + ' WHERE Id = :rid';
             List<SObject> rows = Database.query(soql);
             if (rows.isEmpty()) return null;
 
             SObject source = obj == 'Account' ? rows[0] : rows[0].getSObject('Account');
             return choose(
-                source == null ? null : (String) source.get(clientField),
-                withProject ? (String) rows[0].get(projectField) : null
+                source == null ? null : (String) source.get(clientApi),
+                projectApi != null ? (String) rows[0].get(projectApi) : null
             );
         } catch (Exception e) {
             return null;
@@ -57,6 +60,14 @@ public with sharing class VeleiroTicketRouting {
         t.clientId = clientId;
         t.projectId = String.isBlank(projectId) ? null : projectId;
         return t;
+    }
+
+    // Nombre real del campo del kit: con prefijo si esta instalado como paquete administrado,
+    // sin prefijo si esta desplegado desde el codigo fuente. null si el kit no esta.
+    private static String resolveField(String obj, String field) {
+        if (hasField(obj, KIT_NAMESPACE + field)) return KIT_NAMESPACE + field;
+        if (hasField(obj, field)) return field;
+        return null;
     }
 
     private static Boolean hasField(String obj, String field) {
