@@ -1,12 +1,13 @@
 {
   "packageDirectories": [
     {
-      "versionName": "Primera version administrada",
-      "versionNumber": "1.0.0.NEXT",
+      "versionName": "Arreglo: la credencial lleva el namespace",
+      "versionNumber": "1.1.0.NEXT",
       "path": "force-app",
       "default": true,
       "package": "Veleiro Ticket Intake",
-      "versionDescription": "Raise a ticket from anywhere in Salesforce and mirror it as a task in Veleiro."
+      "versionDescription": "Corrige el callout a Veleiro dentro del paquete administrado: la Named Credential es veleiro__Veleiro_Ticket_API, y con el nombre pelado el ticket nunca salia de Salesforce.",
+      "ancestorVersion": "HIGHEST"
     }
   ],
   "name": "veleiro-ticket-intake",
