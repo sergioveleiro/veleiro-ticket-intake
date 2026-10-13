@@ -55,10 +55,10 @@ public with sharing class VeleiroTicketController {
     public static void saveEnvironment(String environment) {
         Veleiro_Ticket_Config__c c = orgDefault();
         if (environment == 'Beta') {
-            c.Base_Url__c = 'callout:Veleiro_Ticket_API_Beta/api/v1';
+            c.Base_Url__c = VeleiroTicketApiClient.calloutTo(VeleiroTicketApiClient.CRED_BETA) + '/api/v1';
             c.App_Base_Url__c = 'https://app.beta.veleiro.dev';
         } else { // Production (default)
-            c.Base_Url__c = 'callout:Veleiro_Ticket_API/api/v1';
+            c.Base_Url__c = VeleiroTicketApiClient.calloutTo(VeleiroTicketApiClient.CRED_PROD) + '/api/v1';
             c.App_Base_Url__c = 'https://app.veleiro.ai';
         }
         upsert c;

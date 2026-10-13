@@ -96,4 +96,28 @@ private class VeleiroTicketServiceTest {
         System.assertEquals(1, projects.size(), 'solo los del client');
         System.assertEquals('Implementation', projects[0].name);
     }
+
+    /**
+     * Dentro del paquete administrado la credencial se llama veleiro__Veleiro_Ticket_API. El
+     * nombre pelado truena con "the named credential might not exist" y el ticket nunca sale de
+     * Salesforce. Sin namespace el prefijo va vacio y el bug es invisible: por eso se simula.
+     */
+    @isTest
+    static void theCalloutCarriesTheNamespaceOfTheManagedPackage() {
+        VeleiroTicketApiClient.namespaceOverride = '';
+        System.assertEquals('callout:Veleiro_Ticket_API/api/v1', VeleiroTicketApiClient.defaultBase());
+
+        VeleiroTicketApiClient.namespaceOverride = 'veleiro__';
+        System.assertEquals('callout:veleiro__Veleiro_Ticket_API/api/v1', VeleiroTicketApiClient.defaultBase());
+        System.assertEquals('callout:veleiro__Veleiro_Ticket_API_Beta',
+            VeleiroTicketApiClient.calloutTo(VeleiroTicketApiClient.CRED_BETA));
+
+        // Una base guardada sin prefijo se repara al vuelo; una URL cruda no se toca.
+        System.assertEquals('callout:veleiro__Veleiro_Ticket_API/api/v1',
+            VeleiroTicketApiClient.withNamespace('callout:Veleiro_Ticket_API/api/v1'));
+        System.assertEquals('callout:veleiro__Veleiro_Ticket_API/api/v1',
+            VeleiroTicketApiClient.withNamespace('callout:veleiro__Veleiro_Ticket_API/api/v1'));
+        System.assertEquals('https://app.veleiro.ai/api/v1',
+            VeleiroTicketApiClient.withNamespace('https://app.veleiro.ai/api/v1'));
+    }
 }

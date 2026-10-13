@@ -16,8 +16,35 @@ public with sharing class VeleiroTicketApiClient {
     }
 
     // Defaults NO-secretos: el partner solo tiene que pegar su token; base URLs caen a estos.
-    private static final String DEFAULT_BASE = 'callout:Veleiro_Ticket_API/api/v1'; // via Named Credential Veleiro_Ticket_API
+    public static final String CRED_PROD = 'Veleiro_Ticket_API';
+    public static final String CRED_BETA = 'Veleiro_Ticket_API_Beta';
     private static final String DEFAULT_APP_BASE = 'https://app.veleiro.ai'; // produccion por defecto (beta: app.beta.veleiro.dev)
+
+    // Costura para los tests: sin namespace el prefijo sale vacio y el bug del nombre de la
+    // credencial es INVISIBLE, porque el literal pelado resulta correcto.
+    @TestVisible private static String namespaceOverride;
+
+    /**
+     * Prefijo del namespace cuando esto corre como paquete administrado ('veleiro__'), vacio
+     * cuando se desplego del codigo fuente. Se deduce del nombre real de un objeto nuestro:
+     * sin namespace son 2 partes ('Veleiro_Ticket', 'c'), con namespace son 3.
+     */
+    public static String namespacePrefix() {
+        if (namespaceOverride != null) return namespaceOverride;
+        List<String> parts = String.valueOf(Veleiro_Ticket__c.SObjectType).split('__');
+        return parts.size() >= 3 ? parts[0] + '__' : '';
+    }
+
+    /**
+     * Ruta de callout a una Named Credential NUESTRA. Dentro del paquete la credencial se llama
+     * veleiro__Veleiro_Ticket_API, y el nombre pelado truena con "the named credential might not
+     * exist": el ticket nunca sale de Salesforce y el cliente solo ve un error.
+     */
+    public static String calloutTo(String credential) {
+        return 'callout:' + namespacePrefix() + credential;
+    }
+
+    public static String defaultBase() { return calloutTo(CRED_PROD) + '/api/v1'; }
 
     // Lo UNICO obligatorio que el partner configura es el token (un secreto). Base_Url es opcional.
     private static Veleiro_Ticket_Config__c cfg() {
@@ -52,9 +79,19 @@ public with sharing class VeleiroTicketApiClient {
     private static String baseUrl(Veleiro_Ticket_Config__c c) {
         String u = (c != null) ? c.Base_Url__c : null;
         if (String.isNotBlank(u) && (u.startsWith('callout:') || u.startsWithIgnoreCase('http'))) {
-            return u;
+            return withNamespace(u);
         }
-        return DEFAULT_BASE; // vacio o malformado (ej. sin el prefijo callout:) -> default correcto
+        return defaultBase(); // vacio o malformado (ej. sin el prefijo callout:) -> default correcto
+    }
+
+    // Repara al vuelo una base guardada sin el namespace, sin reescribir el dato del cliente.
+    @TestVisible
+    private static String withNamespace(String url) {
+        String prefix = namespacePrefix();
+        if (String.isBlank(prefix) || !url.startsWith('callout:')) return url;
+        String credential = url.substring('callout:'.length());
+        if (credential.startsWithIgnoreCase(prefix)) return url;
+        return 'callout:' + prefix + credential;
     }
 
     // URL base humana del portal de Veleiro para los links "Open in Veleiro" (cualquier nivel de config).
