@@ -19,6 +19,9 @@ public with sharing class VeleiroTicketController {
         @AuraEnabled public String clientName;
         @AuraEnabled public String projectId;
         @AuraEnabled public String projectName;
+        @AuraEnabled public Integer enabledProjects; // cuantos proyectos habilito el partner
+        @AuraEnabled public String pullFrequency;    // hourly | daily | off
+        @AuraEnabled public Datetime pullNextRun;    // cuando suena el reloj la proxima vez
     }
 
     @AuraEnabled(cacheable=false)
@@ -37,6 +40,16 @@ public with sharing class VeleiroTicketController {
             s.projectId = c.Veleiro_Project_Id__c;
             s.projectName = c.Veleiro_Project_Name__c;
         }
+        s.enabledProjects = [SELECT COUNT() FROM Veleiro_Ticket_Project__c WHERE Active__c = true];
+        // La frecuencia no se guarda: se lee del reloj, que es la verdad de lo que va a pasar.
+        for (CronTrigger ct : [
+            SELECT CronExpression, NextFireTime FROM CronTrigger
+            WHERE CronJobDetail.Name = :VeleiroTicketPullJob.JOB_NAME LIMIT 1
+        ]) {
+            s.pullFrequency = ct.CronExpression == '0 0 6 * * ?' ? 'daily' : 'hourly';
+            s.pullNextRun = ct.NextFireTime;
+        }
+        if (s.pullFrequency == null) s.pullFrequency = 'off';
         return s;
     }
 

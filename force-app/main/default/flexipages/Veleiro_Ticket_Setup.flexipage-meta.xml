@@ -9,12 +9,6 @@
                 <identifier>veleiroTicketConfig1</identifier>
             </componentInstance>
         </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentName>c:veleiroTicketProjects</componentName>
-                <identifier>veleiroTicketProjectsComp</identifier>
-            </componentInstance>
-        </itemInstances>
     </flexiPageRegions>
     <masterLabel>Veleiro Ticket Setup</masterLabel>
     <template>

@@ -1,48 +1,112 @@
 :host {
-    --veleiro-navy: #040b25;
-    --veleiro-navy-hover: #0a1740;
-    --veleiro-accent: #cfe6f8;
-    --veleiro-line: #e7eef6;
-    --veleiro-muted: #5a6b82;
-
+    --vt-navy: #040b25;
+    --vt-navy-hover: #12224d;
+    --vt-blue: #0084fb;
+    --vt-green: #1b9e6f;
+    --vt-line: #e7eef6;
+    --vt-muted: #5a6b82;
+    --vt-canvas: #f4f8fc;
     display: block;
-    max-width: 560px;
 }
 
-.velly-card-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--veleiro-navy);
-    font-weight: 700;
-}
-.velly-mascot-sm {
-    height: 30px;
-    width: auto;
-    filter: drop-shadow(0 1px 3px rgba(4, 11, 37, 0.18));
-}
-.velly-accentbar {
-    height: 4px;
-    background: linear-gradient(90deg, var(--veleiro-navy) 0%, var(--veleiro-accent) 100%);
-    border-radius: 2px;
-    margin: 0 12px 8px 12px;
+/* El paquete vive en la org del cliente, que puede tener su propio theme de Lightning:
+   la superficie pinta su propio fondo y su propia tinta en vez de heredarlos. */
+.vts {
+    background: var(--vt-canvas);
+    color: var(--vt-navy);
+    padding: 20px;
+    border-radius: 16px;
 }
 
-code {
-    background: #eef4fb;
-    border-radius: 4px;
-    padding: 0 4px;
+.vts-head { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+.vts-mascot { height: 46px; width: auto; flex: none; filter: drop-shadow(0 2px 6px rgba(4,11,37,.18)); }
+.vts-head-text { flex: 1; min-width: 0; }
+.vts-head h1 { font-size: 1.22rem; font-weight: 800; letter-spacing: -.02em; }
+.vts-head p { font-size: .84rem; color: var(--vt-muted); margin-top: 3px; max-width: 70ch; }
+.vts-env {
+    flex: none; font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+    background: #fff; border: 1px solid var(--vt-line); border-radius: 999px; padding: 4px 11px;
+    color: var(--vt-muted);
 }
 
-/* Brand the primary buttons (SLDS styling hooks) */
-.velly-brand-btn {
-    --slds-c-button-brand-color-background: var(--veleiro-navy);
-    --slds-c-button-brand-color-border: var(--veleiro-navy);
-    --slds-c-button-brand-color-background-hover: var(--veleiro-navy-hover);
-    --slds-c-button-brand-color-border-hover: var(--veleiro-navy-hover);
-    --slds-c-button-brand-color-background-active: var(--veleiro-navy-hover);
-    --sds-c-button-brand-color-background: var(--veleiro-navy);
-    --sds-c-button-brand-color-border: var(--veleiro-navy);
-    --sds-c-button-brand-color-background-hover: var(--veleiro-navy-hover);
-    --sds-c-button-brand-color-border-hover: var(--veleiro-navy-hover);
+/* Un paso: encabezado siempre visible, cuerpo solo cuando esta abierto. */
+.vts-step {
+    background: #fff; border: 1px solid var(--vt-line); border-radius: 14px;
+    margin-bottom: 10px; overflow: hidden;
+    box-shadow: 0 1px 2px rgba(4,11,37,.03);
+}
+.vts-step:last-child { margin-bottom: 0; }
+.vts-open { box-shadow: 0 1px 2px rgba(4,11,37,.04), 0 18px 34px -26px rgba(4,11,37,.45); }
+.vts-locked { opacity: .55; }
+.vts-locked .vts-row { cursor: default; }
+
+.vts-row {
+    display: flex; align-items: center; gap: 13px; padding: 14px 16px; cursor: pointer;
+    text-align: left;
+}
+.vts-row:hover { background: #fbfdff; }
+.vts-locked .vts-row:hover { background: #fff; }
+.vts-row-text { flex: 1; min-width: 0; }
+.vts-row h2 { font-size: .94rem; font-weight: 700; }
+.vts-summary {
+    font-size: .79rem; color: var(--vt-muted); margin-top: 2px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* El numero se vuelve marca verde cuando el paso esta hecho de verdad. */
+.vts-num {
+    flex: none; width: 28px; height: 28px; border-radius: 50%;
+    display: grid; place-items: center;
+    font-size: .82rem; font-weight: 800;
+    background: var(--vt-canvas); color: var(--vt-muted); border: 1px solid var(--vt-line);
+}
+.vts-done .vts-num {
+    background: var(--vt-green); border-color: var(--vt-green); color: #fff; font-size: 0;
+}
+.vts-done .vts-num::after { content: '\2713'; font-size: .92rem; }
+.vts-open:not(.vts-done) .vts-num { border-color: var(--vt-navy); color: var(--vt-navy); }
+
+.vts-badge {
+    flex: none; font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+    color: #116b4c; background: rgba(27,158,111,.12); border-radius: 999px; padding: 3px 9px;
+}
+
+.vts-body { padding: 2px 16px 18px; border-top: 1px solid var(--vt-line); }
+.vts-body-flush { padding: 12px 10px 14px; }
+.vts-note { font-size: .8rem; color: var(--vt-muted); margin: 12px 0; max-width: 72ch; }
+.vts-field { display: block; margin-top: 10px; }
+.vts-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+.vts-loading { position: relative; min-height: 44px; }
+
+/* Lista de clientes: filtrar escribiendo en vez de un dropdown largo. */
+.vts-clients { margin-top: 10px; border: 1px solid var(--vt-line); border-radius: 10px; overflow: hidden; }
+.vts-clients:empty { display: none; }
+.vts-clients li + li { border-top: 1px solid var(--vt-line); }
+.vts-client {
+    display: block; width: 100%; text-align: left; background: #fff; border: 0;
+    padding: 9px 13px; font-size: .86rem; color: var(--vt-navy); cursor: pointer;
+}
+.vts-client:hover { background: #f7fafd; }
+.vts-client-on { background: #e8f3fd; font-weight: 700; box-shadow: inset 3px 0 0 var(--vt-blue); }
+
+/* Controles redondeados y a todo el ancho, como el resto del kit. */
+.vts-body lightning-input, .vts-body lightning-combobox, .vts-body lightning-radio-group {
+    --slds-c-input-radius-border: 10px;
+    --sds-c-input-radius-border: 10px;
+    display: block;
+}
+.vts-brand-btn {
+    --slds-c-button-brand-color-background: var(--vt-navy);
+    --slds-c-button-brand-color-border: var(--vt-navy);
+    --slds-c-button-brand-color-background-hover: var(--vt-navy-hover);
+    --slds-c-button-brand-color-border-hover: var(--vt-navy-hover);
+    --sds-c-button-brand-color-background: var(--vt-navy);
+    --sds-c-button-brand-color-border: var(--vt-navy);
+    --sds-c-button-brand-color-background-hover: var(--vt-navy-hover);
+    --sds-c-button-brand-color-border-hover: var(--vt-navy-hover);
+}
+
+@media (max-width: 560px) {
+    .vts { padding: 14px; }
+    .vts-head { flex-wrap: wrap; }
 }

@@ -1,106 +1,152 @@
 <template>
-    <lightning-card>
-        <div slot="title" class="velly-card-title">
-            <img src={mascot} alt="Velly" class="velly-mascot-sm" />
-            <span>Ticket Intake Setup</span>
-        </div>
-        <div class="velly-accentbar"></div>
-        <div class="slds-p-horizontal_medium slds-p-bottom_medium slds-p-top_x-small">
-            <!-- ===================== Connection ===================== -->
-            <div class="slds-text-title_caps slds-text-color_weak slds-m-bottom_xx-small">1 · Connection</div>
-
-            <!-- Connected summary -->
-            <template if:false={showConnectionForm}>
-                <div class="slds-box slds-box_xx-small slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
-                    <div class="slds-text-body_regular">
-                        <lightning-icon icon-name="utility:success" size="xx-small" variant="success"></lightning-icon>
-                        <span class="slds-m-left_xx-small">{connectionSummary}</span>
-                    </div>
-                    <lightning-button label="Edit" variant="neutral" onclick={editConnection}></lightning-button>
-                </div>
+    <div class="vts">
+        <header class="vts-head">
+            <img src={mascot} alt="Velly" class="vts-mascot" />
+            <div class="vts-head-text">
+                <h1>{labels.setupTitle}</h1>
+                <p>{labels.setupSub}</p>
+            </div>
+            <template if:true={connected}>
+                <span class="vts-env">{setup.environment}</span>
             </template>
+        </header>
 
-            <!-- Connect / edit form -->
-            <template if:true={showConnectionForm}>
-                <div class="slds-box slds-theme_shade">
+        <!-- 1 · Conexión -->
+        <section class={class1} data-step="1">
+            <div class="vts-row" data-step="1" onclick={handleStepClick}>
+                <span class="vts-num">1</span>
+                <div class="vts-row-text">
+                    <h2>{labels.s1}</h2>
+                    <p class="vts-summary">{summary1}</p>
+                </div>
+                <template if:true={step1.done}>
+                    <span class="vts-badge">{labels.stepDone}</span>
+                </template>
+            </div>
+            <template if:true={show1}>
+                <div class="vts-body">
+                    <p class="vts-note">{labels.s1sub}</p>
                     <lightning-combobox
-                        label="Veleiro environment"
+                        label={labels.environment}
                         value={environment}
                         options={envOptions}
-                        onchange={handleEnv}
-                    ></lightning-combobox>
-
+                        onchange={handleEnv}></lightning-combobox>
                     <lightning-input
-                        class="slds-m-top_x-small"
+                        class="vts-field"
                         type="password"
-                        label="API Token"
+                        label={labels.token}
                         value={token}
-                        onchange={handleToken}
                         placeholder={tokenPlaceholder}
-                    ></lightning-input>
-                    <p class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small">
-                        Needs <code>task:write</code> plus client/project read. Stored in this org only, never in code.
-                    </p>
-
-                    <div class="slds-m-top_small">
-                        <lightning-button
-                            variant="brand"
-                            label="Connect"
-                            onclick={saveConnection}
-                            disabled={savingConnection}
-                            class="velly-brand-btn"
-                        ></lightning-button>
-                        <template if:true={canCancelConnection}>
-                            <lightning-button
-                                class="slds-m-left_x-small"
-                                label="Cancel"
-                                onclick={cancelConnection}
-                            ></lightning-button>
-                        </template>
+                        onchange={handleToken}></lightning-input>
+                    <div class="vts-actions">
+                        <lightning-button variant="brand" label={labels.connect}
+                            onclick={saveConnection} disabled={savingConnection}
+                            class="vts-brand-btn"></lightning-button>
                     </div>
                 </div>
             </template>
+        </section>
 
-            <!-- ===================== Mapping ===================== -->
-            <template if:true={showMapping}>
-                <div class="slds-text-title_caps slds-text-color_weak slds-m-top_medium slds-m-bottom_xx-small">
-                    2 · Ticket destination
+        <!-- 2 · Cliente -->
+        <section class={class2} data-step="2">
+            <div class="vts-row" data-step="2" onclick={handleStepClick}>
+                <span class="vts-num">2</span>
+                <div class="vts-row-text">
+                    <h2>{labels.s2}</h2>
+                    <p class="vts-summary">{summary2}</p>
                 </div>
-                <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_x-small">
-                    Which Veleiro client and project the tickets raised in this org are filed under.
-                </p>
-
-                <lightning-combobox
-                    label="Veleiro Client"
-                    placeholder="Search clients…"
-                    value={selectedClient}
-                    options={clientOptions}
-                    onchange={handleClient}
-                ></lightning-combobox>
-
-                <lightning-combobox
-                    class="slds-m-top_x-small"
-                    label="Veleiro Project (optional)"
-                    placeholder="Pick a client first"
-                    value={selectedProject}
-                    options={projectOptions}
-                    onchange={handleProject}
-                ></lightning-combobox>
-
-                <div class="slds-m-top_medium">
-                    <lightning-button
-                        variant="brand"
-                        label="Save destination"
-                        onclick={save}
-                        disabled={loading}
-                        class="velly-brand-btn"
-                    ></lightning-button>
-                </div>
-
-                <template if:true={loading}>
-                    <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                <template if:true={step2.done}>
+                    <span class="vts-badge">{labels.stepDone}</span>
                 </template>
+            </div>
+            <template if:true={show2}>
+                <div class="vts-body">
+                    <p class="vts-note">{labels.s2sub}</p>
+                    <lightning-input
+                        type="search"
+                        label={labels.client}
+                        placeholder={labels.clientPlaceholder}
+                        value={clientQuery}
+                        onchange={handleClientQuery}
+                        oninput={handleClientQuery}></lightning-input>
+
+                    <template if:true={loadingClients}>
+                        <div class="vts-loading">
+                            <lightning-spinner size="small" alternative-text="…"></lightning-spinner>
+                        </div>
+                    </template>
+
+                    <ul class="vts-clients">
+                        <template for:each={clientRows} for:item="c">
+                            <li key={c.id}>
+                                <button type="button" class={c.cls} data-id={c.id} data-name={c.name}
+                                    onclick={handlePickClient}>{c.name}</button>
+                            </li>
+                        </template>
+                    </ul>
+                    <template if:true={hasMoreClients}>
+                        <p class="vts-note">+{moreClients} · {labels.clientPlaceholder}</p>
+                    </template>
+
+                    <div class="vts-actions">
+                        <lightning-button variant="brand" label={labels.saveClient}
+                            onclick={saveClient} disabled={savingClient}
+                            class="vts-brand-btn"></lightning-button>
+                    </div>
+                </div>
             </template>
-        </div>
-    </lightning-card>
+        </section>
+
+        <!-- 3 · Proyectos -->
+        <section class={class3} data-step="3">
+            <div class="vts-row" data-step="3" onclick={handleStepClick}>
+                <span class="vts-num">3</span>
+                <div class="vts-row-text">
+                    <h2>{labels.s3}</h2>
+                    <p class="vts-summary">{summary3}</p>
+                </div>
+                <template if:true={step3.done}>
+                    <span class="vts-badge">{labels.stepDone}</span>
+                </template>
+            </div>
+            <template if:true={show3}>
+                <div class="vts-body vts-body-flush">
+                    <c-veleiro-ticket-projects onprojectschanged={handleProjectsChanged}></c-veleiro-ticket-projects>
+                </div>
+            </template>
+        </section>
+
+        <!-- 4 · Sincronización -->
+        <section class={class4} data-step="4">
+            <div class="vts-row" data-step="4" onclick={handleStepClick}>
+                <span class="vts-num">4</span>
+                <div class="vts-row-text">
+                    <h2>{labels.s4}</h2>
+                    <p class="vts-summary">{summary4}</p>
+                </div>
+                <template if:true={step4.done}>
+                    <span class="vts-badge">{labels.stepDone}</span>
+                </template>
+            </div>
+            <template if:true={show4}>
+                <div class="vts-body">
+                    <p class="vts-note">{labels.s4sub}</p>
+                    <lightning-radio-group
+                        name="frequency"
+                        label={labels.frequency}
+                        options={freqOptions}
+                        value={frequency}
+                        type="radio"
+                        onchange={handleFrequency}></lightning-radio-group>
+                    <div class="vts-actions">
+                        <lightning-button variant="brand" label={labels.save}
+                            onclick={saveSchedule} disabled={busy4}
+                            class="vts-brand-btn"></lightning-button>
+                        <lightning-button label={labels.pullNow}
+                            onclick={handlePullNow} disabled={busy4}></lightning-button>
+                    </div>
+                </div>
+            </template>
+        </section>
+    </div>
 </template>

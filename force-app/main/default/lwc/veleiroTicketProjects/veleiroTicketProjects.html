@@ -1,17 +1,21 @@
 <template>
     <div class="vtp">
         <div class="vtp-head">
-            <div>
-                <h3>Proyectos de este cliente</h3>
-                <p>Dalos de alta primero en Veleiro. Aquí eliges cuáles ve el cliente y en cuáles puede levantar tickets.</p>
-            </div>
-            <lightning-button-icon icon-name="utility:refresh" alternative-text="Recargar"
-                title="Recargar desde Veleiro" variant="border-filled" onclick={load}
+            <span class="vtp-count">{countLabel}</span>
+            <template if:true={showFilter}>
+                <div class="vtp-filter">
+                    <lightning-input type="search" variant="label-hidden" label={labels.searchProjects}
+                        placeholder={labels.searchProjects} value={query}
+                        onchange={handleQuery} oninput={handleQuery}></lightning-input>
+                </div>
+            </template>
+            <lightning-button-icon icon-name="utility:refresh" alternative-text={labels.change}
+                title={labels.change} variant="border-filled" onclick={load}
                 disabled={busy}></lightning-button-icon>
         </div>
 
         <template if:true={loading}>
-            <div class="vtp-loading"><lightning-spinner size="small" alternative-text="Leyendo Veleiro…"></lightning-spinner></div>
+            <div class="vtp-loading"><lightning-spinner size="small" alternative-text="…"></lightning-spinner></div>
         </template>
 
         <template if:true={error}>
@@ -21,41 +25,44 @@
         <template if:true={hasRows}>
             <div class="vtp-rows">
                 <div class="vtp-row vtp-row-head">
-                    <span class="vtp-name">Proyecto</span>
-                    <span class="vtp-col">Sincronizar</span>
-                    <span class="vtp-col">Puede levantar</span>
+                    <span class="vtp-name">{labels.colProject}</span>
+                    <span class="vtp-col">{labels.colSync}</span>
+                    <span class="vtp-col">{labels.colCanRaise}</span>
                 </div>
-                <template for:each={rows} for:item="r">
+                <template for:each={visibleRows} for:item="r">
                     <div key={r.projectId} class="vtp-row">
                         <span class="vtp-name">
                             {r.name}
                             <span class="vtp-sub">{r.status}</span>
                         </span>
                         <span class="vtp-col">
-                            <lightning-input type="toggle" variant="label-hidden" label="Sincronizar"
-                                message-toggle-active="Sí" message-toggle-inactive="No"
+                            <lightning-input type="toggle" variant="label-hidden" label={labels.colSync}
+                                message-toggle-active={labels.yes} message-toggle-inactive={labels.no}
                                 checked={r.enabled} data-id={r.projectId} data-field="enabled"
                                 onchange={handleToggle}></lightning-input>
                         </span>
                         <span class="vtp-col">
-                            <lightning-input type="toggle" variant="label-hidden" label="Puede levantar"
-                                message-toggle-active="Sí" message-toggle-inactive="Solo mirar"
+                            <lightning-input type="toggle" variant="label-hidden" label={labels.colCanRaise}
+                                message-toggle-active={labels.yes} message-toggle-inactive={labels.watchOnly}
                                 checked={r.clientCanCreate} data-id={r.projectId} data-field="clientCanCreate"
                                 onchange={handleToggle}></lightning-input>
                         </span>
                     </div>
                 </template>
+                <template if:true={nothingMatches}>
+                    <div class="vtp-row vtp-row-empty">{labels.noMatches}</div>
+                </template>
             </div>
             <div class="vtp-actions">
-                <lightning-button variant="brand" label="Guardar" onclick={handleSave} disabled={busy}></lightning-button>
-                <lightning-button label="Traer cambios ahora" onclick={handlePull} disabled={busy}></lightning-button>
-                <span class="vtp-hint">Los tickets se traen solos cada hora. Apagar un proyecto no borra lo ya traído.</span>
+                <lightning-button variant="brand" label={labels.save} onclick={handleSave}
+                    disabled={busy} class="vtp-brand-btn"></lightning-button>
+                <span class="vtp-hint">{labels.pullHint}</span>
             </div>
         </template>
 
         <template if:false={hasRows}>
             <template if:false={loading}>
-                <p class="vtp-empty">{emptyMessage}</p>
+                <p class="vtp-empty">{labels.noProjects}</p>
             </template>
         </template>
     </div>

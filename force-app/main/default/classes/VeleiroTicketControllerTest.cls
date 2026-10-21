@@ -13,6 +13,29 @@ private class VeleiroTicketControllerTest {
         System.assertEquals('org_test', s.clientId);
         System.assertEquals('Colfondos', s.clientName);
         System.assertEquals('prjct_test', s.projectId);
+        // El setup muestra los pasos 3 y 4 como pendientes mientras no haya proyectos ni reloj.
+        System.assertEquals(0, s.enabledProjects, 'org nueva: ningun proyecto habilitado');
+        System.assertEquals('off', s.pullFrequency, 'sin reloj programado la frecuencia es off');
+        System.assertEquals(null, s.pullNextRun, 'sin reloj no hay proxima corrida');
+    }
+
+    @isTest
+    static void setupSeesTheProjectsAndTheClock() {
+        insert new Veleiro_Ticket_Project__c(
+            Name = 'Rollout', Veleiro_Project_Id__c = 'prjct_a', Veleiro_Client_Id__c = 'org_test',
+            Active__c = true
+        );
+        insert new Veleiro_Ticket_Project__c(
+            Name = 'Apagado', Veleiro_Project_Id__c = 'prjct_b', Veleiro_Client_Id__c = 'org_test',
+            Active__c = false
+        );
+        Test.startTest();
+        VeleiroTicketController.schedulePull('hourly');
+        VeleiroTicketController.SetupInfo s = VeleiroTicketController.getSetup();
+        Test.stopTest();
+        System.assertEquals(1, s.enabledProjects, 'solo cuenta los activos');
+        System.assertEquals('hourly', s.pullFrequency, 'la frecuencia se lee del reloj, no de un campo');
+        System.assertNotEquals(null, s.pullNextRun, 'un reloj programado sabe cuando suena');
     }
 
     @isTest
