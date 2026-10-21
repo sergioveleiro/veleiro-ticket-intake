@@ -1,0 +1,65 @@
+<template>
+    <div class="vtp">
+        <div class="vtp-head">
+            <div class="vtp-id">
+                <span class="vtp-key">{taskKey}</span>
+                <template if:true={archived}>
+                    <span class="vtp-archived">{labels.archived}</span>
+                </template>
+            </div>
+            <img src={mascotUrl} class="vtp-mascot" alt="Velly" />
+        </div>
+
+        <div class={stageClass}>
+            <span class="vtp-stage-dot"></span>
+            <span class="vtp-stage-name">{status}</span>
+        </div>
+
+        <dl class="vtp-facts">
+            <template if:true={project}>
+                <div><dt>{labels.colProject}</dt><dd>{project}</dd></div>
+            </template>
+            <template if:true={priority}>
+                <div><dt>{labels.fPriority}</dt><dd>{priority}</dd></div>
+            </template>
+            <template if:true={hasAssignees}>
+                <div><dt>{labels.fAssigned}</dt><dd>{assignees}</dd></div>
+            </template>
+            <template if:true={hasFiles}>
+                <div><dt>{labels.fFiles}</dt><dd>{fileCount}</dd></div>
+            </template>
+            <template if:true={updated}>
+                <div><dt>{labels.fUpdated}</dt><dd><lightning-formatted-date-time value={updated}
+                    year="numeric" month="short" day="2-digit" hour="2-digit" minute="2-digit"></lightning-formatted-date-time></dd></div>
+            </template>
+        </dl>
+
+        <template if:true={hasLabels}>
+            <div class="vtp-chips">
+                <template for:each={chips} for:item="c">
+                    <span key={c.key} class="vtp-chip">{c.name}</span>
+                </template>
+            </div>
+        </template>
+
+        <template if:true={hasError}>
+            <div class="vtp-error">{syncError}</div>
+        </template>
+
+        <div class="vtp-cta">
+            <template if:true={hasLink}>
+                <a class="vtp-btn vtp-btn-solid" href={taskUrl} target="_blank" rel="noopener">
+                    {labels.openTask} &#8599;
+                </a>
+            </template>
+            <template if:false={hasLink}>
+                <span class="vtp-pending">{labels.notSentYet}</span>
+            </template>
+            <template if:true={hasBoard}>
+                <a class="vtp-btn" href={boardUrl} target="_blank" rel="noopener">
+                    {labels.openBoard} &#8599;
+                </a>
+            </template>
+        </div>
+    </div>
+</template>

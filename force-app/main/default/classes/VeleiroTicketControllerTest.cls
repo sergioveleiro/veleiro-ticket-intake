@@ -185,4 +185,15 @@ private class VeleiroTicketControllerTest {
         try { VeleiroTicketController.retryPush(t.Id); } catch (Exception e) { threwWithoutToken = true; }
         System.assertEquals(true, threwWithoutToken);
     }
+
+    @IsTest
+    static void boardUrlPointsAtTheProjectAndNeedsOne() {
+        // Sin proyecto no hay tablero que abrir: el panel esconde el boton en vez de romperlo.
+        System.assertEquals(null, VeleiroTicketController.boardUrl(null), 'sin id no hay url');
+        System.assertEquals(null, VeleiroTicketController.boardUrl('  '), 'en blanco tampoco');
+
+        String url = VeleiroTicketController.boardUrl('prjct_123');
+        System.assert(url.endsWith('/a/partner-portal/projects/prjct_123'), 'url del tablero: ' + url);
+        System.assert(url.startsWith('http'), 'la base es la del portal, no un callout: ' + url);
+    }
 }

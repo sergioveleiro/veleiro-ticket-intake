@@ -1,0 +1,25 @@
+<template>
+    <div class="vtd">
+        <lightning-record-form
+            record-id={recordId}
+            object-api-name={objectApiName}
+            fields={editable}
+            columns="2"
+            mode="view"
+            density="comfy">
+        </lightning-record-form>
+
+        <lightning-card title={labels.originTitle} icon-name="utility:anchor">
+            <div class="vtd-origin">
+                <lightning-record-form
+                    record-id={recordId}
+                    object-api-name={objectApiName}
+                    fields={origin}
+                    columns="2"
+                    mode="readonly"
+                    density="comfy">
+                </lightning-record-form>
+            </div>
+        </lightning-card>
+    </div>
+</template>

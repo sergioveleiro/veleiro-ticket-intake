@@ -42,6 +42,27 @@ Never add a component whose API name exists in the kit (`VeleiroApi*`, `Veleiro_
 - The token needs **`task:write`** (+ client/project read). Until granted, `/tasks` returns 403 `insufficient_scope` and tickets stay in `Error` (saved locally).
 - Utility-bar record capture is only reliable in console apps; the URL is always available.
 
+## La pagina de registro (y por que no es un Layout)
+
+- **El layout por defecto lo autogenera la org con un nombre que depende de su idioma**
+  ("Formato Veleiro Ticket" en espanol). Un `Layout` empaquetado entra como un segundo layout
+  **sin asignar**, asi que el cliente sigue viendo la pagina autogenerada con cuatro campos.
+  La pagina de registro vive por eso en `flexipages/Veleiro_Ticket_Record` y se asigna desde el
+  paquete con `actionOverrides` (`View`, formFactor `Large` y `Small`) en el `.object-meta.xml`.
+  El layout se queda solo para el modal de New/Edit estandar.
+- **Los campos los pinta `veleiroTicketDetail`, no secciones de campo del flexipage.** Las
+  etiquetas de seccion de un flexipage son texto plano y no siguen el idioma del usuario;
+  `lightning-record-form` toma la etiqueta de cada campo del metadata, que Salesforce ya traduce.
+- **Contrato real de un flexipage** (sale de probar contra una org, no de la doc):
+  `flexipage:fieldSection` referencia su facet con `body` como `valueList` de **un** nombre y la
+  propiedad `columns` tambien se interpreta como nombre de facet, no como numero; `mode>Replace`
+  solo se permite si la pagina tiene `parentFlexiPage`; `flexipage:tabset` no acepta `label`; y un
+  LWC se referencia por su nombre pelado (`veleiroTicketPanel`), no como `c:veleiroTicketPanel`.
+- **Un deploy es atomico.** Si el flexipage falla, los LWC del mismo deploy no quedan en la org
+  aunque el reporte diga "79/80": despliega componentes primero y la pagina despues.
+- **No hay pestana de Chatter a proposito.** Veleiro todavia no tiene endpoint de comentarios, y
+  un feed en Salesforce seria una conversacion que Veleiro nunca ve.
+
 ## Commands
 
 ```bash

@@ -348,6 +348,17 @@ public with sharing class VeleiroTicketController {
         upsert rows Veleiro_Project_Id__c;
     }
 
+    /**
+     * URL del tablero del proyecto en Veleiro. La arma Apex porque depende del entorno
+     * configurado (produccion o beta), que el componente no conoce ni deberia adivinar.
+     * La URL del ticket NO se construye: esa viene lista de la API y se guarda tal cual.
+     */
+    @AuraEnabled(cacheable=true)
+    public static String boardUrl(String veleiroProjectId) {
+        if (String.isBlank(veleiroProjectId)) return null;
+        return VeleiroTicketApiClient.appBaseUrl() + '/a/partner-portal/projects/' + veleiroProjectId;
+    }
+
     // ---- bajada desde Veleiro ----
 
     /**

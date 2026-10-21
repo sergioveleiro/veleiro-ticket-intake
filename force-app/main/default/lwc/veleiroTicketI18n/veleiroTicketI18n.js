@@ -8,6 +8,15 @@
 import LANG from '@salesforce/i18n/lang';
 
 const EN = {
+    openTask: 'Open this ticket in Veleiro',
+    originTitle: 'Where this came from',
+    openBoard: 'See the board in Veleiro',
+    archived: 'Archived in Veleiro',
+    notSentYet: 'Not in Veleiro yet',
+    fPriority: 'Priority',
+    fAssigned: 'Assigned to',
+    fFiles: 'Files',
+    fUpdated: 'Updated',
     setupTitle: 'Ticket Intake setup',
     setupSub: 'Three steps. The customer raises tickets here; your team works them in Veleiro.',
     s1: 'Connect to Veleiro',
@@ -51,6 +60,15 @@ const EN = {
 };
 
 const ES = {
+    openTask: 'Abrir este ticket en Veleiro',
+    originTitle: 'De dónde salió',
+    openBoard: 'Ver el tablero en Veleiro',
+    archived: 'Archivado en Veleiro',
+    notSentYet: 'Todavía no está en Veleiro',
+    fPriority: 'Prioridad',
+    fAssigned: 'Asignado a',
+    fFiles: 'Archivos',
+    fUpdated: 'Actualizado',
     setupTitle: 'Configuración de tickets',
     setupSub: 'Tres pasos. El cliente levanta los tickets aquí; tu equipo los trabaja en Veleiro.',
     s1: 'Conecta con Veleiro',
@@ -94,6 +112,15 @@ const ES = {
 };
 
 const PT = {
+    openTask: 'Abrir este ticket no Veleiro',
+    originTitle: 'De onde veio',
+    openBoard: 'Ver o quadro no Veleiro',
+    archived: 'Arquivado no Veleiro',
+    notSentYet: 'Ainda não está no Veleiro',
+    fPriority: 'Prioridade',
+    fAssigned: 'Atribuído a',
+    fFiles: 'Arquivos',
+    fUpdated: 'Atualizado',
     setupTitle: 'Configuração de tickets',
     setupSub: 'Três passos. O cliente abre os tickets aqui; seu time trabalha neles no Veleiro.',
     s1: 'Conecte ao Veleiro',
