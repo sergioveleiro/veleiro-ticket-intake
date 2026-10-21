@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Open_Tickets</fullName>
+    <label>Open tickets</label>
+    <filterScope>Everything</filterScope>
+    <!-- Lo cerrado y lo archivado no es trabajo en curso: esta es la vista para el tablero. -->
+    <filters>
+        <field>Veleiro_Ticket__c.Work_Status__c</field>
+        <operation>notEqual</operation>
+        <value>terminal</value>
+    </filters>
+    <filters>
+        <field>Veleiro_Ticket__c.Is_Archived__c</field>
+        <operation>equals</operation>
+        <value>0</value>
+    </filters>
+    <columns>NAME</columns>
+    <columns>Title__c</columns>
+    <columns>Veleiro_Status__c</columns>
+    <columns>Priority__c</columns>
+    <columns>Veleiro_Project_Name__c</columns>
+    <columns>Assignees__c</columns>
+    <columns>Veleiro_Updated_At__c</columns>
+</ListView>

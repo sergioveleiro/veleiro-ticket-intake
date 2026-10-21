@@ -52,6 +52,10 @@ public with sharing class VeleiroTicketPull {
             return r;
         }
 
+        // El nombre del proyecto se resuelve aqui: la task solo trae el id.
+        Map<String, String> projectNameById = new Map<String, String>();
+        for (Veleiro_Ticket_Project__c p : projects) projectNameById.put(p.Veleiro_Project_Id__c, p.Name);
+
         List<Veleiro_Ticket__c> toSave = new List<Veleiro_Ticket__c>();
         Map<Id, Datetime> watermark = new Map<Id, Datetime>();
 
@@ -62,7 +66,7 @@ public with sharing class VeleiroTicketPull {
                 Datetime newest = p.Last_Pulled_At__c;
                 for (Object o : VeleiroTicketApiClient.listAll('/tasks', filtersFor(p))) {
                     Map<String, Object> task = (Map<String, Object>) o;
-                    toSave.add(toTicket(task, p, stateTypeById, memberNameById));
+                    toSave.add(toTicket(task, p, stateTypeById, memberNameById, projectNameById));
                     Datetime updated = parseStamp((String) task.get('updated_at'));
                     if (updated != null && (newest == null || updated > newest)) newest = updated;
                     if (toSave.size() >= maxPerRun) break;
@@ -110,7 +114,8 @@ public with sharing class VeleiroTicketPull {
 
     private static Veleiro_Ticket__c toTicket(Map<String, Object> task, Veleiro_Ticket_Project__c p,
                                               Map<String, String> stateTypeById,
-                                              Map<String, String> memberNameById) {
+                                              Map<String, String> memberNameById,
+                                              Map<String, String> projectNameById) {
         Veleiro_Ticket__c t = new Veleiro_Ticket__c();
         t.Veleiro_Task_Id__c = (String) task.get('id');
         t.Title__c = abbrev((String) task.get('title'), 255);
@@ -124,6 +129,9 @@ public with sharing class VeleiroTicketPull {
         t.Priority__c = titled((String) task.get('priority'));
         t.Veleiro_Client_Id__c = (String) task.get('client_id');
         t.Veleiro_Project_Id__c = (String) task.get('project_id');
+        t.Veleiro_Project_Name__c = projectNameById.containsKey((String) task.get('project_id'))
+            ? projectNameById.get((String) task.get('project_id'))
+            : p.Name;
         t.Is_Archived__c = (task.get('is_archived') == true);
         t.Veleiro_Version__c = numberOf(task.get('version'));
         t.Veleiro_Updated_At__c = parseStamp((String) task.get('updated_at'));

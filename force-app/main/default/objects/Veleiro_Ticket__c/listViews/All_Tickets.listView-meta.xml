@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>All_Tickets</fullName>
+    <label>All tickets</label>
+    <filterScope>Everything</filterScope>
+    <columns>NAME</columns>
+    <columns>Title__c</columns>
+    <columns>Veleiro_Status__c</columns>
+    <columns>Work_Status__c</columns>
+    <columns>Priority__c</columns>
+    <columns>Veleiro_Project_Name__c</columns>
+    <columns>Is_Archived__c</columns>
+    <columns>Veleiro_Updated_At__c</columns>
+</ListView>

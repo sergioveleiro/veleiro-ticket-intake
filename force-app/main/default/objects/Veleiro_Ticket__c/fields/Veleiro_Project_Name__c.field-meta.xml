@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Veleiro_Project_Name__c</fullName>
+    <label>Project</label>
+    <type>Text</type>
+    <length>80</length>
+    <required>false</required>
+    <description>Nombre del proyecto, resuelto contra los proyectos habilitados. Existe porque una tarjeta de Kanban o una vista de lista con "prjct_27glvy6o" no le dice nada a nadie.</description>
+</CustomField>

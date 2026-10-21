@@ -75,6 +75,7 @@
     <fieldPermissions><field>Veleiro_Ticket__c.Work_Status__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
     <fieldPermissions><field>Veleiro_Ticket__c.Veleiro_Status_Id__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
     <fieldPermissions><field>Veleiro_Ticket__c.Assignees__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Veleiro_Ticket__c.Veleiro_Project_Name__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
     <fieldPermissions><field>Veleiro_Ticket__c.Labels__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
     <fieldPermissions><field>Veleiro_Ticket__c.Attachment_Count__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
     <fieldPermissions><field>Veleiro_Ticket__c.Veleiro_Updated_At__c</field><readable>true</readable><editable>true</editable></fieldPermissions>

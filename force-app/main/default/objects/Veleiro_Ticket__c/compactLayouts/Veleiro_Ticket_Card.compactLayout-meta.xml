@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Veleiro_Ticket_Card</fullName>
+    <label>Veleiro Ticket Card</label>
+    <!--
+      Es la tarjeta del Kanban y el encabezado del registro, asi que caben pocos campos y
+      tienen que ser los que se leen de un vistazo: que estado real tiene en Veleiro (no el
+      tipo, que ya es la columna), que tan urgente es, de que proyecto viene y quien lo tiene.
+    -->
+    <fields>Veleiro_Status__c</fields>
+    <fields>Priority__c</fields>
+    <fields>Veleiro_Project_Name__c</fields>
+    <fields>Assignees__c</fields>
+    <fields>Veleiro_Task_Key__c</fields>
+</CompactLayout>
