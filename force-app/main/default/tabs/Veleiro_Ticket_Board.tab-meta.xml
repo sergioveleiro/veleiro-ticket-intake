@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+    <flexiPage>Veleiro_Ticket_Board</flexiPage>
+    <label>Veleiro Ticket Advance View</label>
+    <motif>Custom20: Kanban</motif>
+</CustomTab>

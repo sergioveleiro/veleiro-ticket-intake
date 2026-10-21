@@ -6,6 +6,7 @@
     <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
     <label>Veleiro Ticket Intake</label>
     <navType>Standard</navType>
+    <tabs>Veleiro_Ticket_Board</tabs>
     <tabs>Veleiro_Ticket__c</tabs>
     <tabs>Veleiro_Ticket_Setup</tabs>
     <uiType>Lightning</uiType>

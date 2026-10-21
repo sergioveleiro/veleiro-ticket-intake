@@ -25,6 +25,18 @@
         <apexClass>VeleiroTicketPushQueueable</apexClass>
         <enabled>true</enabled>
     </classAccesses>
+    <classAccesses>
+        <apexClass>VeleiroTicketBoardController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>VeleiroTicketMove</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>VeleiroTicketStates</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
 
     <objectPermissions>
         <object>Veleiro_Ticket__c</object>
@@ -72,6 +84,10 @@
     <fieldPermissions><field>Veleiro_Ticket__c.Veleiro_Updated_At__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
     <fieldPermissions><field>Veleiro_Ticket__c.Is_Archived__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
 
+    <tabSettings>
+        <tab>Veleiro_Ticket_Board</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
     <tabSettings>
         <tab>Veleiro_Ticket__c</tab>
         <visibility>Visible</visibility>

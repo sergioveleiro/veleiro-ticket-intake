@@ -1,0 +1,193 @@
+<template>
+    <div class="vtb">
+        <header class="vtb-head">
+            <img src={mascot} alt="Velly" class="vtb-mascot" />
+            <div class="vtb-head-text">
+                <h1>{labels.boardTitle}</h1>
+                <p>{labels.boardSub}</p>
+            </div>
+            <div class="vtb-head-actions">
+                <div class="vtb-toggles" role="group">
+                    <button type="button" class={boardBtnClass} data-view="board" onclick={handleView}>
+                        {labels.viewBoard}
+                    </button>
+                    <button type="button" class={listBtnClass} data-view="list" onclick={handleView}>
+                        {labels.viewList}
+                    </button>
+                </div>
+                <lightning-button-icon icon-name="utility:refresh" variant="border-filled"
+                    alternative-text={labels.refresh} title={labels.refresh}
+                    onclick={handleRefresh} disabled={busy}></lightning-button-icon>
+                <lightning-button label={labels.pullNow} onclick={handlePull}
+                    disabled={busy}></lightning-button>
+                <template if:true={hasBoardUrl}>
+                    <a class="vtb-btn-link" href={boardUrl} target="_blank" rel="noopener">
+                        {labels.openBoard} &#8599;
+                    </a>
+                </template>
+            </div>
+        </header>
+
+        <div class="vtb-bar">
+            <div class="vtb-search">
+                <lightning-input type="search" variant="label-hidden" label={labels.search}
+                    placeholder={labels.search} value={query}
+                    onchange={handleQuery} oninput={handleQuery}></lightning-input>
+            </div>
+            <lightning-combobox variant="label-hidden" label={labels.allProjects}
+                value={project} options={projectOptions} onchange={handleProject}
+                class="vtb-pick"></lightning-combobox>
+            <lightning-combobox variant="label-hidden" label={labels.allPriorities}
+                value={priority} options={priorityOptions} onchange={handlePriority}
+                class="vtb-pick"></lightning-combobox>
+            <lightning-combobox variant="label-hidden" label={labels.allAssignees}
+                value={assignee} options={assigneeOptions} onchange={handleAssignee}
+                class="vtb-pick"></lightning-combobox>
+            <template if:true={listView}>
+                <lightning-combobox variant="label-hidden" label={labels.groupBy}
+                    value={groupField} options={groupOptions} onchange={handleGroup}
+                    class="vtb-pick"></lightning-combobox>
+            </template>
+            <label class="vtb-check">
+                <input type="checkbox" checked={withArchived} onchange={handleArchived} />
+                <span>{labels.showArchived}</span>
+            </label>
+            <template if:true={hasFilters}>
+                <button type="button" class="vtb-clear" onclick={clearFilters}>{labels.clearFilters}</button>
+            </template>
+            <span class="vtb-count">{countLabel}</span>
+        </div>
+
+        <template if:true={error}>
+            <div class="vtb-error">{error}</div>
+        </template>
+
+        <template if:true={isTruncated}>
+            <p class="vtb-note">{truncatedLabel}</p>
+        </template>
+
+        <!-- ===================== Tablero ===================== -->
+        <template if:true={boardView}>
+            <p class="vtb-note">{labels.dragHint}</p>
+            <div class="vtb-board">
+                <template for:each={columns} for:item="col">
+                    <section key={col.stage} class={col.cls} data-stage={col.stage}
+                        ondragover={handleDragOver} ondragleave={handleDragLeave} ondrop={handleDrop}>
+                        <header class="vtb-col-head">
+                            <span class="vtb-col-dot"></span>
+                            <span class="vtb-col-name">{col.label}</span>
+                            <span class="vtb-col-count">{col.count}</span>
+                        </header>
+                        <div class="vtb-col-body">
+                            <template for:each={col.cards} for:item="c">
+                                <article key={c.recordId} class={c.cardCls} draggable="true"
+                                    tabindex="0" role="button" data-id={c.recordId}
+                                    ondragstart={handleDragStart} ondragend={handleDragEnd}
+                                    onclick={handleOpen} onkeydown={handleOpenKey}>
+                                    <div class="vtb-card-top">
+                                        <span class="vtb-key">{c.name}</span>
+                                        <template if:true={c.priority}>
+                                            <span class={c.prioCls}>{c.priority}</span>
+                                        </template>
+                                    </div>
+                                    <p class="vtb-card-title">{c.title}</p>
+                                    <template if:true={c.project}>
+                                        <p class="vtb-card-project">{c.project}</p>
+                                    </template>
+                                    <template if:true={c.hasLabels}>
+                                        <div class="vtb-chips">
+                                            <template for:each={c.chips} for:item="chip">
+                                                <span key={chip.key} class="vtb-chip">{chip.name}</span>
+                                            </template>
+                                        </div>
+                                    </template>
+                                    <footer class="vtb-card-foot">
+                                        <template if:true={c.hasAssignees}>
+                                            <span class="vtb-foot-item">{c.assignees}</span>
+                                        </template>
+                                        <template if:true={c.hasDue}>
+                                            <span class="vtb-foot-item">
+                                                <lightning-formatted-date-time value={c.dueDate}
+                                                    month="short" day="2-digit"></lightning-formatted-date-time>
+                                            </span>
+                                        </template>
+                                        <template if:true={c.hasFiles}>
+                                            <span class="vtb-foot-item">&#128206; {c.files}</span>
+                                        </template>
+                                        <template if:true={c.archived}>
+                                            <span class="vtb-foot-archived">{labels.archived}</span>
+                                        </template>
+                                    </footer>
+                                </article>
+                            </template>
+                            <template if:true={col.empty}>
+                                <p class="vtb-col-empty">{labels.emptyColumn}</p>
+                            </template>
+                        </div>
+                    </section>
+                </template>
+            </div>
+        </template>
+
+        <!-- ===================== Lista ===================== -->
+        <template if:true={listView}>
+            <template if:true={nothingVisible}>
+                <p class="vtb-empty">{labels.nothingHere}</p>
+            </template>
+            <template for:each={groups} for:item="g">
+                <div key={g.key} class="vtb-group">
+                    <template if:true={g.showHeader}>
+                        <h2 class="vtb-group-head">{g.label} <span>{g.count}</span></h2>
+                    </template>
+                    <div class="vtb-table" role="table">
+                        <div class="vtb-tr vtb-th" role="row">
+                            <span>{labels.colTicket}</span>
+                            <span>{labels.colStage}</span>
+                            <span>{labels.fPriority}</span>
+                            <span>{labels.colProject}</span>
+                            <span>{labels.fAssigned}</span>
+                            <span>{labels.colDue}</span>
+                            <span>{labels.fUpdated}</span>
+                        </div>
+                        <template for:each={g.rows} for:item="c">
+                            <div key={c.recordId} class="vtb-tr" role="row" tabindex="0"
+                                data-id={c.recordId} onclick={handleOpen} onkeydown={handleOpenKey}>
+                                <span class="vtb-td-title">
+                                    <strong>{c.name}</strong>
+                                    <span>{c.title}</span>
+                                </span>
+                                <span><span class={c.stageCls}>{c.statusOrStage}</span></span>
+                                <span>{c.priority}</span>
+                                <span>{c.project}</span>
+                                <span>{c.assignees}</span>
+                                <span>
+                                    <template if:true={c.hasDue}>
+                                        <lightning-formatted-date-time value={c.dueDate}
+                                            month="short" day="2-digit"></lightning-formatted-date-time>
+                                    </template>
+                                </span>
+                                <span>
+                                    <template if:true={c.updated}>
+                                        <lightning-formatted-date-time value={c.updated}
+                                            month="short" day="2-digit" hour="2-digit"
+                                            minute="2-digit"></lightning-formatted-date-time>
+                                    </template>
+                                </span>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+        </template>
+
+        <template if:true={boardView}>
+            <template if:true={nothingVisible}>
+                <p class="vtb-empty">{labels.nothingHere}</p>
+            </template>
+        </template>
+
+        <template if:true={busy}>
+            <div class="vtb-busy"><lightning-spinner size="small" alternative-text="…"></lightning-spinner></div>
+        </template>
+    </div>
+</template>

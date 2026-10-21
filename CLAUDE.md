@@ -63,6 +63,33 @@ Never add a component whose API name exists in the kit (`VeleiroApi*`, `Veleiro_
 - **No hay pestana de Chatter a proposito.** Veleiro todavia no tiene endpoint de comentarios, y
   un feed en Salesforce seria una conversacion que Veleiro nunca ve.
 
+## La vista avanzada (Veleiro Ticket Advance View)
+
+- **Las list views de Salesforce no alcanzan dentro de un paquete.** El Kanban solo agrupa por
+  picklists **editables**, su configuracion de columnas no es metadata empaquetable, y una list
+  view que viaja en un paquete administrado le llega al cliente en **solo lectura**: no puede
+  agregarle un filtro, solo clonarla. Por eso los tickets tienen su propia tab,
+  `flexipages/Veleiro_Ticket_Board` + `lwc/veleiroTicketBoard`, con tablero y lista.
+- **El filtrado pasa en el navegador.** `VeleiroTicketBoardController.load()` manda todos los
+  tickets (tope `maxRows`, 2000) y el LWC filtra sobre eso: son los tickets de un solo cliente y
+  filtrar sin ir al servidor es lo que hace que la vista se sienta viva. Si se llega al tope la
+  vista lo dice; nunca muestra un numero incompleto como si fuera el total.
+- **Arrastrar escribe en Veleiro ANTES que en Salesforce** (`VeleiroTicketMove.toStage`). El orden
+  importa: la version anterior cambiaba `Work_Status__c` local y la siguiente bajada lo borraba en
+  silencio, asi que la persona creia haber movido algo que nunca se movio. Si la API rechaza, en
+  Salesforce no cambia nada y el LWC avisa ramificando por `code`
+  (`not_allowed`, `no_such_stage`, `not_in_veleiro`, `version_conflict`).
+- **`Client_Allowed_States__c` es el candado real, no el permiso del campo.** El campo del Kanban
+  tuvo que volverse editable para que Salesforce lo ofreciera como agrupador, asi que la regla de
+  a que etapas puede mover el cliente vive en `VeleiroTicketMove.allowed()`. Acepta el nombre del
+  estado de Veleiro ("UAT") o el tipo ("review"), un valor por linea; en blanco no restringe.
+- **`VeleiroTicketStates` resuelve tipo -> id de estado** con `/tasks/states`, una vez por
+  transaccion. Cuando dos estados comparten tipo (un partner tenia "Input Required" y "Action
+  Needed", ambos `blocked`) gana el primero por nombre: la eleccion tiene que ser **estable**, o
+  el mismo arrastre caeria en un estado distinto cada vez.
+- **Las etiquetas de las etapas salen de `c/veleiroTicketI18n`, no del describe del picklist.** Los
+  labels de un picklist empaquetado no siguen el idioma del usuario sin Translation Workbench.
+
 ## Commands
 
 ```bash
