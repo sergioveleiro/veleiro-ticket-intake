@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
     <label>Veleiro Ticket Intake User</label>
-    <description>Lets a user raise Veleiro tickets, configure the intake, and see the Veleiro Ticket Intake app.</description>
+    <description>Para la gente del CLIENTE: levanta tickets, los ve y sigue su avance. No alcanza la configuracion del paquete ni el token — eso vive en Veleiro Ticket Admin, que el partner se asigna a si mismo.</description>
     <hasActivationRequired>false</hasActivationRequired>
 
     <applicationVisibilities>
@@ -50,25 +50,29 @@
     <fieldPermissions><field>Veleiro_Ticket__c.SF_Record_Id__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
     <fieldPermissions><field>Veleiro_Ticket__c.SF_Object__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
     <fieldPermissions><field>Veleiro_Ticket__c.SF_Record_Name__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
-    <fieldPermissions><field>Veleiro_Ticket__c.Status__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
-    <fieldPermissions><field>Veleiro_Ticket__c.Veleiro_Client_Id__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
-    <fieldPermissions><field>Veleiro_Ticket__c.Veleiro_Project_Id__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
-    <fieldPermissions><field>Veleiro_Ticket__c.Veleiro_Task_Id__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
-    <fieldPermissions><field>Veleiro_Ticket__c.Veleiro_Task_Key__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
-    <fieldPermissions><field>Veleiro_Ticket__c.Veleiro_Version__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
-    <fieldPermissions><field>Veleiro_Ticket__c.Veleiro_Status__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
-    <fieldPermissions><field>Veleiro_Ticket__c.Veleiro_Task_Url__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
-    <fieldPermissions><field>Veleiro_Ticket__c.Last_Sync__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
-    <fieldPermissions><field>Veleiro_Ticket__c.Sync_Error__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
+    <fieldPermissions><field>Veleiro_Ticket__c.Status__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Veleiro_Ticket__c.Veleiro_Client_Id__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Veleiro_Ticket__c.Veleiro_Project_Id__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Veleiro_Ticket__c.Veleiro_Task_Id__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Veleiro_Ticket__c.Veleiro_Task_Key__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Veleiro_Ticket__c.Veleiro_Version__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Veleiro_Ticket__c.Veleiro_Status__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Veleiro_Ticket__c.Veleiro_Task_Url__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Veleiro_Ticket__c.Last_Sync__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Veleiro_Ticket__c.Sync_Error__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
     <fieldPermissions><field>Veleiro_Ticket__c.Submitted_By_Name__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
     <fieldPermissions><field>Veleiro_Ticket__c.Submitted_By_Email__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
 
+    <fieldPermissions><field>Veleiro_Ticket__c.Work_Status__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Veleiro_Ticket__c.Veleiro_Status_Id__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Veleiro_Ticket__c.Assignees__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Veleiro_Ticket__c.Labels__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Veleiro_Ticket__c.Attachment_Count__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Veleiro_Ticket__c.Veleiro_Updated_At__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Veleiro_Ticket__c.Is_Archived__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+
     <tabSettings>
         <tab>Veleiro_Ticket__c</tab>
-        <visibility>Visible</visibility>
-    </tabSettings>
-    <tabSettings>
-        <tab>Veleiro_Ticket_Setup</tab>
         <visibility>Visible</visibility>
     </tabSettings>
 </PermissionSet>

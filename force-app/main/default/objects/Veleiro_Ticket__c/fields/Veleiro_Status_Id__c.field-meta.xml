@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Veleiro_Status_Id__c</fullName>
+    <label>Veleiro Status Id</label>
+    <type>Text</type>
+    <length>100</length>
+    <required>false</required>
+    <description>Id del estado en Veleiro (tckt_st_...). Se guarda para poder distinguir dos estados que comparten state_type, como "Input Required" y "Action Needed", que ambos son blocked.</description>
+</CustomField>

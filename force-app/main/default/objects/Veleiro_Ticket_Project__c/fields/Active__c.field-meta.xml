@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Active__c</fullName>
+    <label>Active</label>
+    <type>Checkbox</type>
+    <defaultValue>true</defaultValue>
+    <description>Apagarlo deja de bajar tickets de este project y lo quita del formulario, sin borrar lo ya sincronizado.</description>
+    <inlineHelpText>Apágalo para dejar de sincronizar este proyecto sin perder los tickets que ya bajaron.</inlineHelpText>
+</CustomField>

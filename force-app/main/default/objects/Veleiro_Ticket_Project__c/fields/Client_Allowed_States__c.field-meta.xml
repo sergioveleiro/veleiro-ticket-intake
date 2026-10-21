@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Client_Allowed_States__c</fullName>
+    <label>States the Client May Set</label>
+    <type>LongTextArea</type>
+    <length>1000</length>
+    <visibleLines>3</visibleLines>
+    <required>false</required>
+    <description>Nombres de estados de Veleiro, uno por linea, a los que el cliente puede mover un ticket desde Salesforce. Vacio = el cliente no cambia el estado. La API de Veleiro acepta cualquier transicion, asi que este limite lo impone el paquete: sirve para habilitar "Aprobado en UAT" sin habilitar "Done".</description>
+    <inlineHelpText>Un estado por línea, tal como se llama en Veleiro. Déjalo vacío para que el cliente no pueda cambiar el estado.</inlineHelpText>
+</CustomField>

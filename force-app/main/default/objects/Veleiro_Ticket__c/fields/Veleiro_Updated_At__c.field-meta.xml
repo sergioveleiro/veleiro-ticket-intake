@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Veleiro_Updated_At__c</fullName>
+    <label>Updated in Veleiro</label>
+    <type>DateTime</type>
+    <required>false</required>
+    <description>updated_at que reporto Veleiro. Es lo que mueve la marca de agua de la bajada y lo que permite saber si Salesforce esta viendo algo viejo.</description>
+</CustomField>

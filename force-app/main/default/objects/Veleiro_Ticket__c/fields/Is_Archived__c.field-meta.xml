@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Is_Archived__c</fullName>
+    <label>Archived in Veleiro</label>
+    <type>Checkbox</type>
+    <defaultValue>false</defaultValue>
+    <description>El ticket fue archivado en Veleiro. No se borra de Salesforce: se marca, para que el cliente entienda por que dejo de moverse.</description>
+</CustomField>
