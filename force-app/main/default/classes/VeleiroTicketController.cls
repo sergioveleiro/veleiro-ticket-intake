@@ -236,4 +236,33 @@ public with sharing class VeleiroTicketController {
         public String base64;
         public String contentType;
     }
+
+    // ---- bajada desde Veleiro ----
+
+    /**
+     * El boton "Traer cambios". La bajada hace callouts, asi que no puede correr dentro de
+     * una accion con DML pendiente; aqui no hay ninguno, va directo y devuelve el conteo.
+     */
+    @AuraEnabled
+    public static VeleiroTicketPull.Result pullNow() {
+        return VeleiroTicketPull.run();
+    }
+
+    // Proyectos habilitados por el partner. Es lo que llena el selector del formulario y lo
+    // unico que el cliente puede elegir: no se ofrece un proyecto que el partner no habilito.
+    @AuraEnabled(cacheable=true)
+    public static List<Veleiro_Ticket_Project__c> listEnabledProjects() {
+        return [
+            SELECT Id, Name, Veleiro_Project_Id__c, Veleiro_Client_Id__c, Client_Can_Create__c,
+                   Client_Allowed_States__c, Last_Pulled_At__c
+            FROM Veleiro_Ticket_Project__c
+            WHERE Active__c = true
+            ORDER BY Name
+        ];
+    }
+
+    @AuraEnabled
+    public static void schedulePull(String frequency) {
+        VeleiroTicketPullJob.schedule(frequency);
+    }
 }

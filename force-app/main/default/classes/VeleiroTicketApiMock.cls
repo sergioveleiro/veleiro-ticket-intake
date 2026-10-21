@@ -16,6 +16,9 @@ public class VeleiroTicketApiMock implements HttpCalloutMock {
     public Integer overrideStatus = null;
     public String  overrideBody   = null;
 
+    // Para aseverar COMO se consulto, no solo que se consulto: el sondeo incremental vive
+    // en la query string, asi que sin esto no hay forma de probarlo.
+    public String lastGetUrl;
     public String lastPostBody;
     public String lastPatchBody;
 
@@ -25,6 +28,7 @@ public class VeleiroTicketApiMock implements HttpCalloutMock {
         String url = req.getEndpoint();
         String m = req.getMethod();
 
+        if (m == 'GET') lastGetUrl = url;
         if (m == 'POST') lastPostBody = req.getBody();
         else if (m == 'PATCH') lastPatchBody = req.getBody();
 
