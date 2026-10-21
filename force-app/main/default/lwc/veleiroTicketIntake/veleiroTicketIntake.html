@@ -11,6 +11,19 @@
         <div class="velly-accentbar"></div>
 
         <div class="velly-body">
+            <!-- Solo cuando el partner habilito mas de un proyecto: con uno no hay que elegir. -->
+            <template if:true={showProjectPicker}>
+                <lightning-combobox
+                    label="Project"
+                    required
+                    placeholder="Which project is this about?"
+                    options={projectOptions}
+                    value={projectId}
+                    onchange={handleProjectChange}
+                    class="slds-m-bottom_x-small"
+                ></lightning-combobox>
+            </template>
+
             <lightning-input
                 label="Title"
                 required

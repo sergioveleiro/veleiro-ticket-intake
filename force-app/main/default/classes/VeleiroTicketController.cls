@@ -124,7 +124,15 @@ public with sharing class VeleiroTicketController {
         t.Status__c = 'New';
         t.Submitted_By_Name__c = UserInfo.getName();
         t.Submitted_By_Email__c = UserInfo.getUserEmail();
-        if (c != null) {
+        // El proyecto lo elige quien levanta el ticket, entre los que el partner habilito.
+        // La config vieja de un solo proyecto queda como respaldo para orgs que aun no migran.
+        Veleiro_Ticket_Project__c chosen = resolveProject(inp.projectId);
+        if (chosen != null) {
+            t.Veleiro_Project_Id__c = chosen.Veleiro_Project_Id__c;
+            t.Veleiro_Client_Id__c = String.isNotBlank(chosen.Veleiro_Client_Id__c)
+                ? chosen.Veleiro_Client_Id__c
+                : (c != null ? c.Veleiro_Client_Id__c : null);
+        } else if (c != null) {
             t.Veleiro_Client_Id__c = c.Veleiro_Client_Id__c;
             t.Veleiro_Project_Id__c = c.Veleiro_Project_Id__c;
         }
@@ -229,12 +237,115 @@ public with sharing class VeleiroTicketController {
         public String sfRecordId;
         public String sfObject;
         public String sfRecordName;
+        public String projectId;    // proyecto de Veleiro elegido en el formulario
         public List<FileInput> files;
     }
     public class FileInput {
         public String name;
         public String base64;
         public String contentType;
+    }
+
+    /**
+     * El proyecto pedido, solo si el partner lo habilito Y dejo que el cliente levante ahi.
+     * Nunca se confia en lo que llega del navegador: un id que no este en la lista se ignora.
+     */
+    private static Veleiro_Ticket_Project__c resolveProject(String veleiroProjectId) {
+        List<Veleiro_Ticket_Project__c> open = [
+            SELECT Id, Veleiro_Project_Id__c, Veleiro_Client_Id__c
+            FROM Veleiro_Ticket_Project__c
+            WHERE Active__c = true AND Client_Can_Create__c = true
+            ORDER BY Name
+        ];
+        if (open.isEmpty()) return null;
+        if (String.isNotBlank(veleiroProjectId)) {
+            for (Veleiro_Ticket_Project__c p : open) {
+                if (p.Veleiro_Project_Id__c == veleiroProjectId) return p;
+            }
+        }
+        // Con uno solo habilitado no hace falta elegir: se usa ese.
+        return open.size() == 1 ? open[0] : null;
+    }
+
+    // Proyectos entre los que el cliente puede elegir al levantar un ticket.
+    @AuraEnabled(cacheable=false)
+    public static List<Veleiro_Ticket_Project__c> listProjectsForIntake() {
+        return [
+            SELECT Id, Name, Veleiro_Project_Id__c
+            FROM Veleiro_Ticket_Project__c
+            WHERE Active__c = true AND Client_Can_Create__c = true
+            ORDER BY Name
+        ];
+    }
+
+    // ---- alta de proyectos (solo el partner) ----
+
+    public class VeleiroProject {
+        @AuraEnabled public String projectId;
+        @AuraEnabled public String name;
+        @AuraEnabled public String clientId;
+        @AuraEnabled public String status;
+        @AuraEnabled public Boolean enabled = false;
+        @AuraEnabled public Boolean clientCanCreate = true;
+    }
+
+    /**
+     * Los proyectos que existen en Veleiro para el client configurado, marcando cuales ya
+     * estan habilitados aqui. Es la lista que ve el partner para decidir.
+     */
+    @AuraEnabled
+    public static List<VeleiroProject> listVeleiroProjects() {
+        Veleiro_Ticket_Config__c c = Veleiro_Ticket_Config__c.getOrgDefaults();
+        Map<String, String> filters = new Map<String, String>();
+        if (c != null && String.isNotBlank(c.Veleiro_Client_Id__c)) {
+            filters.put('client_id', c.Veleiro_Client_Id__c);
+        }
+        Map<String, Veleiro_Ticket_Project__c> already = new Map<String, Veleiro_Ticket_Project__c>();
+        for (Veleiro_Ticket_Project__c p : [
+            SELECT Veleiro_Project_Id__c, Active__c, Client_Can_Create__c FROM Veleiro_Ticket_Project__c
+        ]) {
+            already.put(p.Veleiro_Project_Id__c, p);
+        }
+
+        List<VeleiroProject> out = new List<VeleiroProject>();
+        for (Object o : VeleiroTicketApiClient.listAll('/projects', filters)) {
+            Map<String, Object> raw = (Map<String, Object>) o;
+            VeleiroProject vp = new VeleiroProject();
+            vp.projectId = (String) raw.get('id');
+            vp.name = (String) raw.get('name');
+            vp.clientId = (String) raw.get('client_id');
+            vp.status = (String) raw.get('status');
+            Veleiro_Ticket_Project__c known = already.get(vp.projectId);
+            if (known != null) {
+                vp.enabled = known.Active__c;
+                vp.clientCanCreate = known.Client_Can_Create__c;
+            }
+            out.add(vp);
+        }
+        return out;
+    }
+
+    /**
+     * Guarda la decision del partner. Deshabilitar no borra: apaga, para que los tickets ya
+     * bajados sigan visibles y el historial del cliente no se evapore.
+     */
+    @AuraEnabled
+    public static void saveEnabledProjects(String projectsJson) {
+        List<Veleiro_Ticket_Project__c> rows = new List<Veleiro_Ticket_Project__c>();
+        for (Object o : (List<Object>) JSON.deserializeUntyped(projectsJson)) {
+            Map<String, Object> m = (Map<String, Object>) o;
+            String id = (String) m.get('projectId');
+            if (String.isBlank(id)) continue;
+            rows.add(new Veleiro_Ticket_Project__c(
+                Name = trunc((String) m.get('name'), 80),
+                Veleiro_Project_Id__c = id,
+                Veleiro_Client_Id__c = (String) m.get('clientId'),
+                Active__c = (m.get('enabled') == true),
+                Client_Can_Create__c = (m.get('clientCanCreate') != false)
+            ));
+        }
+        if (rows.isEmpty()) return;
+        upsert rows Veleiro_Project_Id__c;
     }
 
     // ---- bajada desde Veleiro ----

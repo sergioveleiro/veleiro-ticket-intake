@@ -1,0 +1,62 @@
+<template>
+    <div class="vtp">
+        <div class="vtp-head">
+            <div>
+                <h3>Proyectos de este cliente</h3>
+                <p>Dalos de alta primero en Veleiro. Aquí eliges cuáles ve el cliente y en cuáles puede levantar tickets.</p>
+            </div>
+            <lightning-button-icon icon-name="utility:refresh" alternative-text="Recargar"
+                title="Recargar desde Veleiro" variant="border-filled" onclick={load}
+                disabled={busy}></lightning-button-icon>
+        </div>
+
+        <template if:true={loading}>
+            <div class="vtp-loading"><lightning-spinner size="small" alternative-text="Leyendo Veleiro…"></lightning-spinner></div>
+        </template>
+
+        <template if:true={error}>
+            <div class="vtp-error">{error}</div>
+        </template>
+
+        <template if:true={hasRows}>
+            <div class="vtp-rows">
+                <div class="vtp-row vtp-row-head">
+                    <span class="vtp-name">Proyecto</span>
+                    <span class="vtp-col">Sincronizar</span>
+                    <span class="vtp-col">Puede levantar</span>
+                </div>
+                <template for:each={rows} for:item="r">
+                    <div key={r.projectId} class="vtp-row">
+                        <span class="vtp-name">
+                            {r.name}
+                            <span class="vtp-sub">{r.status}</span>
+                        </span>
+                        <span class="vtp-col">
+                            <lightning-input type="toggle" variant="label-hidden" label="Sincronizar"
+                                message-toggle-active="Sí" message-toggle-inactive="No"
+                                checked={r.enabled} data-id={r.projectId} data-field="enabled"
+                                onchange={handleToggle}></lightning-input>
+                        </span>
+                        <span class="vtp-col">
+                            <lightning-input type="toggle" variant="label-hidden" label="Puede levantar"
+                                message-toggle-active="Sí" message-toggle-inactive="Solo mirar"
+                                checked={r.clientCanCreate} data-id={r.projectId} data-field="clientCanCreate"
+                                onchange={handleToggle}></lightning-input>
+                        </span>
+                    </div>
+                </template>
+            </div>
+            <div class="vtp-actions">
+                <lightning-button variant="brand" label="Guardar" onclick={handleSave} disabled={busy}></lightning-button>
+                <lightning-button label="Traer cambios ahora" onclick={handlePull} disabled={busy}></lightning-button>
+                <span class="vtp-hint">Los tickets se traen solos cada hora. Apagar un proyecto no borra lo ya traído.</span>
+            </div>
+        </template>
+
+        <template if:false={hasRows}>
+            <template if:false={loading}>
+                <p class="vtp-empty">{emptyMessage}</p>
+            </template>
+        </template>
+    </div>
+</template>

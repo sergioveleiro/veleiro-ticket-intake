@@ -4,6 +4,7 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { MASCOT } from 'c/veleiroTicketBrand';
 import getSetup from '@salesforce/apex/VeleiroTicketController.getSetup';
 import createTicket from '@salesforce/apex/VeleiroTicketController.createTicket';
+import listProjectsForIntake from '@salesforce/apex/VeleiroTicketController.listProjectsForIntake';
 
 // Etiquetas amigables para el usuario final. VeleiroTicketService normaliza cada valor
 // al que ACEPTA el API de Veleiro (task/story/… y low/medium/high/critical) antes de enviar.
@@ -31,6 +32,9 @@ export default class VeleiroTicketIntake extends LightningElement {
     sfRecordId = '';
     sfObject = '';
     @track files = []; // { name, base64, contentType }
+    // Proyectos que el partner habilito para que el cliente levante tickets ahi.
+    @track projects = [];
+    projectId = '';
 
     setup;
     submitting = false;
@@ -64,6 +68,15 @@ export default class VeleiroTicketIntake extends LightningElement {
             })
             .catch(() => {
                 /* sin setup mostramos el form igual */
+            });
+        listProjectsForIntake()
+            .then((rows) => {
+                this.projects = rows || [];
+                // Con uno solo no hay nada que elegir: se usa ese y el selector no aparece.
+                if (this.projects.length === 1) this.projectId = this.projects[0].Veleiro_Project_Id__c;
+            })
+            .catch(() => {
+                /* sin proyectos habilitados cae al de la configuracion, como antes */
             });
     }
 
@@ -110,7 +123,7 @@ export default class VeleiroTicketIntake extends LightningElement {
     }
 
     get canSubmit() {
-        return !this.submitting && !!this.title && this.title.trim().length > 0;
+        return !this.submitting && !!this.title && this.title.trim().length > 0 && !this.missingProject;
     }
 
     get fileNames() {
@@ -192,6 +205,23 @@ export default class VeleiroTicketIntake extends LightningElement {
         this.files = this.files.filter((f, i) => i !== idx);
     }
 
+    get projectOptions() {
+        return this.projects.map((p) => ({ label: p.Name, value: p.Veleiro_Project_Id__c }));
+    }
+
+    // El selector solo aparece cuando de verdad hay algo que decidir.
+    get showProjectPicker() {
+        return this.projects.length > 1;
+    }
+
+    get missingProject() {
+        return this.showProjectPicker && !this.projectId;
+    }
+
+    handleProjectChange(event) {
+        this.projectId = event.detail.value;
+    }
+
     submit() {
         if (!this.canSubmit) return;
         this.submitting = true;
@@ -204,6 +234,7 @@ export default class VeleiroTicketIntake extends LightningElement {
             sourceUrl: this.sourceUrl,
             sfRecordId: this.sfRecordId,
             sfObject: this.sfObject,
+            projectId: this.projectId,
             files: this.files
         };
         createTicket({ payloadJson: JSON.stringify(payload) })

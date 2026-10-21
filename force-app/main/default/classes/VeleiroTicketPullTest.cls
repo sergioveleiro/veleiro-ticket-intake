@@ -259,4 +259,110 @@ private class VeleiroTicketPullTest {
         VeleiroTicketController.schedulePull('off');
         Test.stopTest();
     }
+
+    // ================= varios proyectos =================
+
+    private static String payload(String title, String projectId) {
+        Map<String, Object> m = new Map<String, Object>{ 'title' => title };
+        if (projectId != null) m.put('projectId', projectId);
+        return JSON.serialize(m);
+    }
+
+    /**
+     * El ticket va al proyecto que eligio quien lo levanto, no al unico de la config vieja.
+     * Es lo que permite que un cliente tenga implementacion y postventa a la vez.
+     */
+    @isTest
+    static void aTicketGoesToTheProjectTheUserPicked() {
+        project('prjct_impl', true);
+        Veleiro_Ticket_Project__c post = new Veleiro_Ticket_Project__c(
+            Name = 'Postventa', Veleiro_Project_Id__c = 'prjct_post', Active__c = true,
+            Veleiro_Client_Id__c = 'org_cliente'
+        );
+        insert post;
+        Test.setMock(HttpCalloutMock.class, new VeleiroTicketApiMock());
+
+        Test.startTest();
+        Id id = VeleiroTicketController.createTicket(payload('Falla en postventa', 'prjct_post'));
+        Test.stopTest();
+
+        Veleiro_Ticket__c t = [SELECT Veleiro_Project_Id__c, Veleiro_Client_Id__c FROM Veleiro_Ticket__c WHERE Id = :id];
+        System.assertEquals('prjct_post', t.Veleiro_Project_Id__c);
+        System.assertEquals('org_cliente', t.Veleiro_Client_Id__c, 'el client sale del proyecto elegido');
+    }
+
+    // Un id que no este habilitado no se respeta: no se confia en lo que llega del navegador.
+    @isTest
+    static void aProjectTheUserIsNotAllowedToUseIsIgnored() {
+        project('prjct_impl', true);
+        Veleiro_Ticket_Project__c soloMirar = new Veleiro_Ticket_Project__c(
+            Name = 'Solo mirar', Veleiro_Project_Id__c = 'prjct_watch', Active__c = true,
+            Client_Can_Create__c = false
+        );
+        insert soloMirar;
+        Test.setMock(HttpCalloutMock.class, new VeleiroTicketApiMock());
+
+        Test.startTest();
+        Id id = VeleiroTicketController.createTicket(payload('Intento colado', 'prjct_watch'));
+        Test.stopTest();
+
+        System.assertNotEquals('prjct_watch',
+            [SELECT Veleiro_Project_Id__c FROM Veleiro_Ticket__c WHERE Id = :id].Veleiro_Project_Id__c,
+            'un proyecto de solo lectura no acepta tickets nuevos');
+    }
+
+    // Con un solo proyecto habilitado no hay nada que elegir: se usa ese.
+    @isTest
+    static void withOneProjectTheUserDoesNotHaveToChoose() {
+        project('prjct_impl', true);
+        Test.setMock(HttpCalloutMock.class, new VeleiroTicketApiMock());
+
+        Test.startTest();
+        Id id = VeleiroTicketController.createTicket(payload('Sin elegir', null));
+        Test.stopTest();
+
+        System.assertEquals('prjct_impl',
+            [SELECT Veleiro_Project_Id__c FROM Veleiro_Ticket__c WHERE Id = :id].Veleiro_Project_Id__c);
+        System.assertEquals(1, VeleiroTicketController.listProjectsForIntake().size());
+    }
+
+    // El partner ve los proyectos de Veleiro con los que ya habilito marcados.
+    @isTest
+    static void thePartnerSeesVeleiroProjectsAndWhatIsAlreadyOn() {
+        project('prjct_impl', true);
+        VeleiroTicketApiMock m = new VeleiroTicketApiMock();
+        m.projectsBody = '{"data":[' +
+            '{"id":"prjct_impl","name":"Implementacion","client_id":"org_x","status":"active"},' +
+            '{"id":"prjct_new","name":"Postventa","client_id":"org_x","status":"planning"}' +
+            '],"has_more":false}';
+        Test.setMock(HttpCalloutMock.class, m);
+
+        Test.startTest();
+        List<VeleiroTicketController.VeleiroProject> rows = VeleiroTicketController.listVeleiroProjects();
+        Test.stopTest();
+
+        System.assertEquals(2, rows.size());
+        Map<String, Boolean> enabledById = new Map<String, Boolean>();
+        for (VeleiroTicketController.VeleiroProject r : rows) enabledById.put(r.projectId, r.enabled);
+        System.assertEquals(true, enabledById.get('prjct_impl'), 'el ya habilitado viene marcado');
+        System.assertEquals(false, enabledById.get('prjct_new'), 'el otro no');
+    }
+
+    // Guardar habilita, y apagar no borra: los tickets ya traidos siguen ahi.
+    @isTest
+    static void savingEnablesAndTurningOffDoesNotDelete() {
+        Test.startTest();
+        VeleiroTicketController.saveEnabledProjects(JSON.serialize(new List<Object>{
+            new Map<String, Object>{ 'projectId' => 'prjct_a', 'name' => 'Implementacion',
+                                     'clientId' => 'org_x', 'enabled' => true, 'clientCanCreate' => true },
+            new Map<String, Object>{ 'projectId' => 'prjct_b', 'name' => 'Postventa',
+                                     'clientId' => 'org_x', 'enabled' => false, 'clientCanCreate' => true }
+        }));
+        Test.stopTest();
+
+        System.assertEquals(2, [SELECT COUNT() FROM Veleiro_Ticket_Project__c], 'los dos quedan registrados');
+        System.assertEquals(1, [SELECT COUNT() FROM Veleiro_Ticket_Project__c WHERE Active__c = true]);
+        System.assertEquals(1, VeleiroTicketController.listEnabledProjects().size(),
+            'solo el activo cuenta para la bajada');
+    }
 }
