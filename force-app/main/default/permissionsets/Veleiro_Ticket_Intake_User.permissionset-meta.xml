@@ -63,7 +63,7 @@
     <fieldPermissions><field>Veleiro_Ticket__c.Submitted_By_Name__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
     <fieldPermissions><field>Veleiro_Ticket__c.Submitted_By_Email__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
 
-    <fieldPermissions><field>Veleiro_Ticket__c.Work_Status__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
+    <fieldPermissions><field>Veleiro_Ticket__c.Work_Status__c</field><readable>true</readable><editable>true</editable></fieldPermissions>
     <fieldPermissions><field>Veleiro_Ticket__c.Veleiro_Status_Id__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
     <fieldPermissions><field>Veleiro_Ticket__c.Assignees__c</field><readable>true</readable><editable>false</editable></fieldPermissions>
     <fieldPermissions><field>Veleiro_Ticket__c.Veleiro_Project_Name__c</field><readable>true</readable><editable>false</editable></fieldPermissions>

@@ -1,0 +1,154 @@
+/**
+ * Textos del setup en el idioma del usuario (es / pt / en).
+ *
+ * Este paquete se instala en la org del CLIENTE del partner, y esos clientes no hablan todos
+ * el mismo idioma: el kit de ventas ya sigue esta regla y aqui vale igual. El ingles es el
+ * respaldo llave por llave, asi que una traduccion que falte sale en ingles y no en blanco.
+ */
+import LANG from '@salesforce/i18n/lang';
+
+const EN = {
+    setupTitle: 'Ticket Intake setup',
+    setupSub: 'Three steps. The customer raises tickets here; your team works them in Veleiro.',
+    s1: 'Connect to Veleiro',
+    s1sub: 'Your partner API key. It stays in this org and never reaches the browser.',
+    s2: 'Who these tickets belong to',
+    s2sub: 'The Veleiro client this org files its tickets under.',
+    s3: 'Projects',
+    s3sub: 'Create them in Veleiro first. Here you choose which ones the customer sees, and in which ones they can raise tickets.',
+    connected: 'Connected',
+    notConnected: 'Not connected',
+    environment: 'Environment',
+    token: 'API token',
+    tokenPlaceholder: 'Paste your Veleiro key',
+    edit: 'Edit',
+    cancel: 'Cancel',
+    connect: 'Connect',
+    client: 'Veleiro client',
+    clientPlaceholder: 'Search clients…',
+    saveClient: 'Save',
+    colProject: 'Project',
+    colSync: 'Sync',
+    colCanRaise: 'Can raise',
+    yes: 'Yes',
+    no: 'No',
+    watchOnly: 'Watch only',
+    save: 'Save',
+    pullNow: 'Pull changes now',
+    pullHint: 'Tickets come down on their own every hour. Turning a project off never deletes what already arrived.',
+    searchProjects: 'Filter projects',
+    noProjects: 'No projects in Veleiro for this client yet. Create them there and come back.',
+    connectFirst: 'Connect to Veleiro first and the projects will show up here.',
+    saved: 'Saved',
+    savedProjects: '{0} project(s) enabled for this customer.',
+    upToDate: 'Up to date',
+    pulled: '{0} tickets from {1} project(s).',
+    couldNotSave: 'Could not save',
+    couldNotRead: 'We could not read the projects from Veleiro.',
+    couldNotPull: 'Could not pull',
+    enabledCount: '{0} of {1} enabled',
+    kanbanHint: 'To see these as a board: open Veleiro Tickets, switch the view to Kanban and group by Stage. Once per org.'
+};
+
+const ES = {
+    setupTitle: 'Configuración de tickets',
+    setupSub: 'Tres pasos. El cliente levanta los tickets aquí; tu equipo los trabaja en Veleiro.',
+    s1: 'Conecta con Veleiro',
+    s1sub: 'Tu llave de partner. Se queda en esta org y nunca llega al navegador.',
+    s2: 'De quién son estos tickets',
+    s2sub: 'El client de Veleiro bajo el que se archivan los tickets de esta org.',
+    s3: 'Proyectos',
+    s3sub: 'Dalos de alta primero en Veleiro. Aquí eliges cuáles ve el cliente y en cuáles puede levantar tickets.',
+    connected: 'Conectado',
+    notConnected: 'Sin conectar',
+    environment: 'Entorno',
+    token: 'API token',
+    tokenPlaceholder: 'Pega tu llave de Veleiro',
+    edit: 'Editar',
+    cancel: 'Cancelar',
+    connect: 'Conectar',
+    client: 'Client de Veleiro',
+    clientPlaceholder: 'Buscar clients…',
+    saveClient: 'Guardar',
+    colProject: 'Proyecto',
+    colSync: 'Sincronizar',
+    colCanRaise: 'Puede levantar',
+    yes: 'Sí',
+    no: 'No',
+    watchOnly: 'Solo mirar',
+    save: 'Guardar',
+    pullNow: 'Traer cambios ahora',
+    pullHint: 'Los tickets se traen solos cada hora. Apagar un proyecto nunca borra lo que ya llegó.',
+    searchProjects: 'Filtrar proyectos',
+    noProjects: 'Todavía no hay proyectos en Veleiro para este cliente. Créalos allá y vuelve.',
+    connectFirst: 'Conecta con Veleiro y aquí aparecerán los proyectos.',
+    saved: 'Guardado',
+    savedProjects: '{0} proyecto(s) habilitados para este cliente.',
+    upToDate: 'Al día',
+    pulled: '{0} tickets desde {1} proyecto(s).',
+    couldNotSave: 'No se pudo guardar',
+    couldNotRead: 'No pudimos leer los proyectos de Veleiro.',
+    couldNotPull: 'No se pudo traer',
+    enabledCount: '{0} de {1} habilitados',
+    kanbanHint: 'Para verlos como tablero: abre Veleiro Tickets, cambia la vista a Kanban y agrupa por Stage. Una vez por org.'
+};
+
+const PT = {
+    setupTitle: 'Configuração de tickets',
+    setupSub: 'Três passos. O cliente abre os tickets aqui; seu time trabalha neles no Veleiro.',
+    s1: 'Conecte ao Veleiro',
+    s1sub: 'Sua chave de partner. Fica nesta org e nunca chega ao navegador.',
+    s2: 'De quem são estes tickets',
+    s2sub: 'O client do Veleiro sob o qual os tickets desta org são arquivados.',
+    s3: 'Projetos',
+    s3sub: 'Crie-os primeiro no Veleiro. Aqui você escolhe quais o cliente vê e em quais pode abrir tickets.',
+    connected: 'Conectado',
+    notConnected: 'Sem conexão',
+    environment: 'Ambiente',
+    token: 'Token de API',
+    tokenPlaceholder: 'Cole sua chave do Veleiro',
+    edit: 'Editar',
+    cancel: 'Cancelar',
+    connect: 'Conectar',
+    client: 'Client do Veleiro',
+    clientPlaceholder: 'Buscar clients…',
+    saveClient: 'Salvar',
+    colProject: 'Projeto',
+    colSync: 'Sincronizar',
+    colCanRaise: 'Pode abrir',
+    yes: 'Sim',
+    no: 'Não',
+    watchOnly: 'Só olhar',
+    save: 'Salvar',
+    pullNow: 'Trazer mudanças agora',
+    pullHint: 'Os tickets chegam sozinhos a cada hora. Desligar um projeto nunca apaga o que já veio.',
+    searchProjects: 'Filtrar projetos',
+    noProjects: 'Ainda não há projetos no Veleiro para este cliente. Crie-os lá e volte.',
+    connectFirst: 'Conecte ao Veleiro e os projetos aparecerão aqui.',
+    saved: 'Salvo',
+    savedProjects: '{0} projeto(s) habilitados para este cliente.',
+    upToDate: 'Em dia',
+    pulled: '{0} tickets de {1} projeto(s).',
+    couldNotSave: 'Não deu para salvar',
+    couldNotRead: 'Não conseguimos ler os projetos do Veleiro.',
+    couldNotPull: 'Não deu para trazer',
+    enabledCount: '{0} de {1} habilitados',
+    kanbanHint: 'Para ver como quadro: abra Veleiro Tickets, mude a visão para Kanban e agrupe por Stage. Uma vez por org.'
+};
+
+function pick(code) {
+    const l = (code || 'en').toLowerCase();
+    if (l.indexOf('es') === 0) return ES;
+    if (l.indexOf('pt') === 0) return PT;
+    return EN;
+}
+
+export const T = { ...EN, ...pick(LANG) };
+
+export function fmt(template, values) {
+    if (!template) return '';
+    return (values || []).reduce(
+        (out, v, i) => out.split(`{${i}}`).join(v === null || v === undefined ? '' : String(v)),
+        template
+    );
+}

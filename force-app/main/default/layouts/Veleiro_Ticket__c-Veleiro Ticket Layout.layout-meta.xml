@@ -61,7 +61,7 @@
             <field>Veleiro_Status__c</field>
         </layoutItems>
         <layoutItems>
-            <behavior>Readonly</behavior>
+            <behavior>Edit</behavior>
             <field>Work_Status__c</field>
         </layoutItems>
         <layoutItems>
