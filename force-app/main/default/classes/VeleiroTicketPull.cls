@@ -122,6 +122,12 @@ public with sharing class VeleiroTicketPull {
         t.Veleiro_Task_Key__c = (String) task.get('key');
         // La URL viene lista de la API: se guarda tal cual en vez de construirla.
         t.Veleiro_Task_Url__c = (String) task.get('url');
+        // description y due_date llegaron a TaskOut despues del primer release. Solo se escriben
+        // cuando la API los manda: un null puede significar "esta task es vieja y no los tiene",
+        // y borrar lo que el cliente escribio en Salesforce no se deshace. Veleiro manda sobre lo
+        // que dice, no sobre lo que calla.
+        if (task.get('description') != null) t.Description__c = (String) task.get('description');
+        if (task.get('due_date') != null) t.Due_Date__c = parseDay((String) task.get('due_date'));
         t.Veleiro_Status__c = (String) task.get('status');
         t.Veleiro_Status_Id__c = (String) task.get('status_id');
         t.Work_Status__c = stateTypeById.get((String) task.get('status_id'));
@@ -207,6 +213,14 @@ public with sharing class VeleiroTicketPull {
     private static String titled(String s) {
         if (String.isBlank(s)) return null;
         return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
+    }
+
+    // due_date viene como 'YYYY-MM-DD'. Una fecha rota no puede costar la bajada entera.
+    @TestVisible
+    private static Date parseDay(String iso) {
+        if (String.isBlank(iso) || iso.length() < 10) return null;
+        try { return Date.valueOf(iso.substring(0, 10)); }
+        catch (Exception e) { return null; }
     }
 
     /**

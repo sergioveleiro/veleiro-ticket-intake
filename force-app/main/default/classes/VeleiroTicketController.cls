@@ -369,7 +369,7 @@ public with sharing class VeleiroTicketController {
     @AuraEnabled(cacheable=true)
     public static String boardUrl(String veleiroProjectId) {
         if (String.isBlank(veleiroProjectId)) return null;
-        return VeleiroTicketApiClient.appBaseUrl() + '/a/partner-portal/projects/' + veleiroProjectId;
+        return VeleiroTicketApiClient.appBaseUrl() + '/a/partner-portal/projects/' + veleiroProjectId + '/';
     }
 
     // ---- bajada desde Veleiro ----

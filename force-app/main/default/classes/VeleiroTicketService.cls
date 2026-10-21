@@ -110,7 +110,7 @@ public with sharing class VeleiroTicketService {
     private static String taskUrl(Veleiro_Ticket__c t) {
         String base = VeleiroTicketApiClient.appBaseUrl();
         if (String.isNotBlank(t.Veleiro_Client_Id__c)) {
-            return base + '/a/partner-portal/organizations/' + t.Veleiro_Client_Id__c;
+            return base + '/a/partner-portal/organizations/' + t.Veleiro_Client_Id__c + '/';
         }
         return base;
     }

@@ -111,7 +111,7 @@ public with sharing class VeleiroTicketBoardController {
             }
         }
         if (String.isNotBlank(projectId)) {
-            b.boardUrl = VeleiroTicketApiClient.appBaseUrl() + '/a/partner-portal/projects/' + projectId;
+            b.boardUrl = VeleiroTicketApiClient.appBaseUrl() + '/a/partner-portal/projects/' + projectId + '/';
         }
         return b;
     }

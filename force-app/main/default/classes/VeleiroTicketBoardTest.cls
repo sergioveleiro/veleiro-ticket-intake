@@ -85,7 +85,7 @@ private class VeleiroTicketBoardTest {
         System.assertEquals(new List<String>{'Ana', 'Beto'}, b.assignees, 'el filtro de gente sale de los tickets');
         System.assertEquals(new List<String>{'Implementation'}, b.projects);
         System.assertEquals(false, b.truncated);
-        System.assert(b.boardUrl.endsWith('/projects/prjct_test'), 'link al tablero: ' + b.boardUrl);
+        System.assert(b.boardUrl.endsWith('/projects/prjct_test/'), 'link al tablero: ' + b.boardUrl);
     }
 
     @isTest

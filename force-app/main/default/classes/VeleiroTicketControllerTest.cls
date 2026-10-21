@@ -216,7 +216,7 @@ private class VeleiroTicketControllerTest {
         System.assertEquals(null, VeleiroTicketController.boardUrl('  '), 'en blanco tampoco');
 
         String url = VeleiroTicketController.boardUrl('prjct_123');
-        System.assert(url.endsWith('/a/partner-portal/projects/prjct_123'), 'url del tablero: ' + url);
+        System.assert(url.endsWith('/a/partner-portal/projects/prjct_123/'), 'url del tablero: ' + url);
         System.assert(url.startsWith('http'), 'la base es la del portal, no un callout: ' + url);
     }
 }

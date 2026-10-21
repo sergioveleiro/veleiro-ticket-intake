@@ -196,7 +196,7 @@ private class VeleiroTicketPullTest {
         ];
         System.assertEquals('Ana Pérez', t.Submitted_By_Name__c, 'Veleiro no sabe quien lo levanto');
         System.assertEquals('Pasos para reproducir', t.Description__c,
-            'la API todavia no devuelve description: no puede borrar la que ya teniamos');
+            'esta task no trae description: callar no es lo mismo que borrar');
         System.assertEquals('001000000000abc', t.SF_Record_Id__c);
         System.assertEquals('in_progress', t.Work_Status__c, 'y el estado si se actualiza');
     }
@@ -364,5 +364,32 @@ private class VeleiroTicketPullTest {
         System.assertEquals(1, [SELECT COUNT() FROM Veleiro_Ticket_Project__c WHERE Active__c = true]);
         System.assertEquals(1, VeleiroTicketController.listEnabledProjects().size(),
             'solo el activo cuenta para la bajada');
+    }
+
+    @isTest
+    static void theBodyAndTheDueDateComeDownToo() {
+        // description y due_date aparecieron en TaskOut despues del primer release. Sin esto el
+        // ticket bajaba con titulo y nada mas, y habia que ir a Veleiro para leer de que se trata.
+        project('prjct_x', true);
+        mockWith('{"data":[{"id":"tckt_body","key":"TASK-9","title":"Con cuerpo",' +
+            '"description":"Lo que hay que hacer, en detalle.","due_date":"2026-11-30",' +
+            '"status":"Backlog","status_id":"tckt_st_back","project_id":"prjct_x",' +
+            '"client_id":"org_x","is_archived":false,"version":1,' +
+            '"updated_at":"2026-10-20T10:00:00+00:00"}],"has_more":false}');
+
+        Test.startTest();
+        VeleiroTicketPull.run();
+        Test.stopTest();
+
+        Veleiro_Ticket__c t = [SELECT Description__c, Due_Date__c FROM Veleiro_Ticket__c LIMIT 1];
+        System.assertEquals('Lo que hay que hacer, en detalle.', t.Description__c);
+        System.assertEquals(Date.newInstance(2026, 11, 30), t.Due_Date__c);
+    }
+
+    @isTest
+    static void aBrokenDueDateDoesNotCostThePull() {
+        System.assertEquals(null, VeleiroTicketPull.parseDay(null), 'nulo no truena');
+        System.assertEquals(null, VeleiroTicketPull.parseDay('manana'), 'basura tampoco');
+        System.assertEquals(Date.newInstance(2026, 11, 30), VeleiroTicketPull.parseDay('2026-11-30'));
     }
 }

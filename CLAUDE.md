@@ -38,6 +38,7 @@ Never add a component whose API name exists in the kit (`VeleiroApi*`, `Veleiro_
 
 - The Veleiro API has **no file upload** endpoint. Screenshots stay in Salesforce Files; only context goes to Veleiro via `additional_fields`.
 - Task create needs only `title`. `due_date`/`start_date`/`status` are PATCH-only.
+- **TaskOut ya devuelve `description` y `due_date`** (no los tenia en el primer release). La bajada los escribe **solo cuando vienen**: un null puede ser una task vieja que no los trae, y borrar lo que el cliente escribio en Salesforce no se deshace. Sigue sin haber endpoint de comentarios.
 - `ticket_type` must be one of epic, story, task, decision, approval, review, deliverable, action_item, milestone, subtask; `priority` one of low, medium, high, critical (`urgent` → critical). `VeleiroTicketService` normalizes.
 - The token needs **`task:write`** (+ client/project read). Until granted, `/tasks` returns 403 `insufficient_scope` and tickets stay in `Error` (saved locally).
 - Utility-bar record capture is only reliable in console apps; the URL is always available.
@@ -89,6 +90,20 @@ Never add a component whose API name exists in the kit (`VeleiroApi*`, `Veleiro_
   el mismo arrastre caeria en un estado distinto cada vez.
 - **Las etiquetas de las etapas salen de `c/veleiroTicketI18n`, no del describe del picklist.** Los
   labels de un picklist empaquetado no siguen el idioma del usuario sin Translation Workbench.
+
+## URLs del portal de Veleiro
+
+- **La URL de una task viene hecha de la API** (`url` en TaskOut:
+  `https://app.beta.veleiro.dev/a/partner-portal/tasks/<tckt_...>/`, **con slash final**) y se
+  guarda tal cual en `Veleiro_Task_Url__c`. Nunca se arma a mano.
+- **Un project NO trae `url`.** Sus campos son id, name, client_id, status, progress,
+  is_archived, version, custom_fields, created_at, updated_at. El link al tablero se construye
+  (`appBaseUrl() + '/a/partner-portal/projects/<id>/'`) y por eso es la parte fragil: si el
+  portal cambia de ruta, se rompe en silencio. Pedir a Veleiro que TaskOut/ProjectOut expongan
+  el `url` del project es lo que cierra este agujero.
+- **Nunca sembrar datos de demo con URLs inventadas.** Un `task_demo_1` que no existe manda al
+  cliente a un "not found" que parece un bug del paquete. Si hacen falta tickets de ejemplo, se
+  baja de Veleiro o se dejan sin URL (el panel ya muestra "Todavia no esta en Veleiro").
 
 ## Commands
 
